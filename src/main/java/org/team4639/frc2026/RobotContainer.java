@@ -90,8 +90,8 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-        autoChooser.addOption("DS-TL", AutoFactory.DS_TL());
-        autoChooser.addOption("DS-TL_DS", AutoFactory.DS_TL_DS());
+        autoChooser.addOption("DriverStation-TrenchLine", AutoFactory.DriverStation_TrenchLine());
+        autoChooser.addOption("DriverStation_TrenchLine-DriverStation", AutoFactory.DriverStation_TrenchLine_DriverStation());
 
 
         // Set up SysId routines

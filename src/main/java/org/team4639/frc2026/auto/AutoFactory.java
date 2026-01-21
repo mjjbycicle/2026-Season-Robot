@@ -11,9 +11,9 @@ public class AutoFactory {
     // at least until we come up with a naming scheme for the paths. Same thing with the trajectory names
     // as much as possible try and have them be the same as the command name and both be easily 
     // understandable.
-    public static Command DS_TL(){
+    public static Command DriverStation_TrenchLine(){
         try{
-            PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("NewPath");
+            PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("DriverStation_TrenchLine");
             return AutoBuilder.followPath(path);
         }
         catch (Exception E){
@@ -21,9 +21,9 @@ public class AutoFactory {
         }
     }
 
-    public static Command DS_TL_DS(){
+    public static Command DriverStation_TrenchLine_DriverStation(){
         try{
-            PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("NewPath2");
+            PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("DriverStation_TrenchLine_DriverStation");
             return AutoBuilder.followPath(path);
         }
         catch (Exception E){
