@@ -91,8 +91,8 @@ public class RobotContainer {
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         autoChooser.addOption("DriverStation-TrenchLine", AutoFactory.DriverStation_TrenchLine());
-        autoChooser.addOption("DriverStation_TrenchLine-DriverStation", AutoFactory.DriverStation_TrenchLine_DriverStation());
-
+        autoChooser.addOption(
+                "DriverStation_TrenchLine-DriverStation", AutoFactory.DriverStation_TrenchLine_DriverStation());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
