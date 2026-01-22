@@ -9,12 +9,12 @@ public final class BuildConstants {
     public static final String MAVEN_GROUP = "";
     public static final String MAVEN_NAME = "2026-Season-Robot";
     public static final String VERSION = "unspecified";
-    public static final int GIT_REVISION = 6;
-    public static final String GIT_SHA = "4b4a9106c041fc6cee4e2b0cc8e95e8bcefe6217";
-    public static final String GIT_DATE = "2026-01-21 06:15:41 CST";
+    public static final int GIT_REVISION = 9;
+    public static final String GIT_SHA = "659cc7e5f96d6a3889e75eed8226d7f2af321f34";
+    public static final String GIT_DATE = "2026-01-22 00:54:15 CST";
     public static final String GIT_BRANCH = "dev-autos";
-    public static final String BUILD_DATE = "2026-01-21 08:51:02 CST";
-    public static final long BUILD_UNIX_TIME = 1769007062060L;
+    public static final String BUILD_DATE = "2026-01-22 17:02:13 CST";
+    public static final long BUILD_UNIX_TIME = 1769122933366L;
     public static final int DIRTY = 1;
 
     private BuildConstants() {}
