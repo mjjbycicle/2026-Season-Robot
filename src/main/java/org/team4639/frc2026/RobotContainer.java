@@ -97,6 +97,18 @@ public class RobotContainer {
         choreoAutoChooser.addCmd("DriverStation-TrenchLine", autoCommands::DriverStation_TrenchLine);
         choreoAutoChooser.addCmd("DriverStation-TrenchLine-DriverStation", autoCommands::DriverStation_TrenchLine_DriverStation);
 
+        /**
+         * Since we're using AdvantageKit, we want to use the LoggedDashboardChooser since it logs which auto was selected.
+         * 
+         * Because of this we lose the lazy loading functionality of Choreo's AutoChooser, which honestly doesnt save us that much anyways since the 
+         * only way to guarantee that we have the right alliance auto is to 1) always pretend we are on blue or 2) load the auto at the moment of auto
+         * starting which is expensive or 3) have every auto for every side loaded beforehand or 4) i figure out what other teams do to fix this
+         * and copy them
+         * 
+         * If we did want to use the Choreo AutoChooser or generally change anything about the way auto is started, we would also have to correspondingly change
+         * the getAutonomousCommand() method
+         */
+
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // autoChooser.addOption("DriverStation-TrenchLine", AutoFactory.DriverStation_TrenchLine());
         // autoChooser.addOption(
