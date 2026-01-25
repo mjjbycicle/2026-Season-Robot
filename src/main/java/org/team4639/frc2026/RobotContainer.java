@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.team4639.frc2026.auto.AutoCommands;
 import org.team4639.frc2026.commands.DriveCommands;
 import org.team4639.frc2026.subsystems.drive.Drive;
 import org.team4639.frc2026.subsystems.drive.GyroIO;
@@ -88,7 +89,13 @@ public class RobotContainer {
         }
 
         // Set up auto routines
+
+        AutoCommands autoCommands = new AutoCommands(drive);
+
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser.addOption("DriverStation-TrenchLine", autoCommands.DriverStation_TrenchLine());
+        autoChooser.addOption(
+                "DriverStation_TrenchLine-DriverStation", autoCommands.DriverStation_TrenchLine_DriverStation());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
