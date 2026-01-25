@@ -2,6 +2,7 @@
 
 package org.team4639.frc2026;
 
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -10,6 +11,9 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team4639.lib.util.FullSubsystem;
+import org.team4639.lib.util.LoggedTracer;
+import org.team4639.lib.util.VirtualSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -69,9 +73,11 @@ public class Robot extends LoggedRobot {
     /** This function is called periodically during all modes. */
     @Override
     public void robotPeriodic() {
+        LoggedTracer.reset();
+        VirtualSubsystem.runAllPeriodic();
         // Optionally switch the thread to high priority to improve loop
         // timing (see the template project documentation for details)
-        // Threads.setCurrentThreadPriority(true, 99);
+        Threads.setCurrentThreadPriority(true, 99);
 
         // Runs the Scheduler. This is responsible for polling buttons, adding
         // newly-scheduled commands, running already-scheduled commands, removing
@@ -81,7 +87,11 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         // Return to non-RT thread priority (do not modify the first argument)
-        // Threads.setCurrentThreadPriority(false, 10);
+        Threads.setCurrentThreadPriority(false, 10);
+        LoggedTracer.record("Commands");
+        VirtualSubsystem.runAllPeriodicAfterScheduler();
+        FullSubsystem.runAllPeriodicAfterScheduler();
+        LoggedTracer.record("PeriodicAfterScheduler");
     }
 
     /** This function is called once when the robot is disabled. */

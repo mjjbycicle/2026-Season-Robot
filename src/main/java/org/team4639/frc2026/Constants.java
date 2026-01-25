@@ -26,4 +26,10 @@ public final class Constants {
         /** Replaying from a log file. */
         REPLAY
     }
+
+    public static final class RobotConstants {
+        public static final double ROBOT_MASS_KG = 74.088;
+        public static final double ROBOT_MOI = 6.883;
+        public static final double WHEEL_COF = 1.5;
+    }
 }

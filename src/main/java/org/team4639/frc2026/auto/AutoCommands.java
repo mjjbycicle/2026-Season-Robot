@@ -2,45 +2,40 @@
 
 package org.team4639.frc2026.auto;
 
-import choreo.Choreo;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import org.team4639.frc2026.RobotState;
 import org.team4639.frc2026.subsystems.drive.Drive;
 
 public class AutoCommands {
     private AutoFactory autoFactory;
-    private Drive driveSubsystem;
 
     public AutoCommands(Drive driveSubsystem) {
-        this.driveSubsystem = driveSubsystem;
         autoFactory = new AutoFactory(
-                driveSubsystem::getPose,
-                driveSubsystem::setPose,
+                RobotState.getInstance()::getEstimatedPose,
+                RobotState.getInstance()::resetPose,
                 driveSubsystem::followTrajectory,
-                true,
+                false,
                 driveSubsystem);
     }
 
     public Command DriverStation_TrenchLine() {
-        var trajectory = Choreo.loadTrajectory("DriverStation_TrenchLine");
-        return Commands.sequence(
-                Commands.runOnce(
-                        () -> driveSubsystem.setPose(
-                                trajectory.get().getInitialPose(true).get()),
-                        driveSubsystem),
-                Commands.runOnce(() -> autoFactory.trajectoryCmd("DriverStation_TrenchLine"), driveSubsystem));
+        AutoRoutine routine = autoFactory.newRoutine("DriverStation_TrenchLine");
+        AutoTrajectory trajectory = routine.trajectory("DriverStation_TrenchLine");
+        routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
+
+        return routine.cmd();
     }
 
     public Command DriverStation_TrenchLine_DriverStation() {
+        AutoRoutine routine = autoFactory.newRoutine("DriverStation_TrenchLine_DriverStation");
+        AutoTrajectory trajectory = routine.trajectory("DriverStation_TrenchLine_DriverStation");
+        routine.active().onTrue(Commands.sequence(trajectory.resetOdometry(), trajectory.cmd()));
 
-        var trajectory = Choreo.loadTrajectory("DriverStation_TrenchLine_DriverStation");
-        return Commands.sequence(
-                Commands.runOnce(
-                        () -> driveSubsystem.setPose(
-                                trajectory.get().getInitialPose(true).get()),
-                        driveSubsystem),
-                Commands.runOnce(
-                        () -> autoFactory.trajectoryCmd("DriverStation_TrenchLine_DriverStation"), driveSubsystem));
+        return routine.cmd();
     }
 }

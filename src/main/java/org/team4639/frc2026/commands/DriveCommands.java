@@ -74,8 +74,7 @@ public class DriveCommands {
                             linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                             linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
                             omega * drive.getMaxAngularSpeedRadPerSec());
-                    boolean isFlipped = DriverStation.getAlliance().isPresent()
-                            && DriverStation.getAlliance().get() == Alliance.Red;
+                    boolean isFlipped = false; // false since our field pose is relative to the alliance wall
                     drive.runVelocity(ChassisSpeeds.fromFieldRelativeSpeeds(
                             speeds,
                             isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));

@@ -17,7 +17,6 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -36,12 +35,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants;
 import org.team4639.frc2026.Constants.Mode;
+import org.team4639.frc2026.RobotState;
 import org.team4639.frc2026.subsystems.drive.generated.TunerConstants;
 import org.team4639.frc2026.util.LocalADStarAK;
 
@@ -57,16 +59,14 @@ public class Drive extends SubsystemBase {
                     Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
 
     // PathPlanner config constants
-    private static final double ROBOT_MASS_KG = 74.088;
-    private static final double ROBOT_MOI = 6.883;
-    private static final double WHEEL_COF = 1.2;
+
     private static final RobotConfig PP_CONFIG = new RobotConfig(
-            ROBOT_MASS_KG,
-            ROBOT_MOI,
+            Constants.RobotConstants.ROBOT_MASS_KG,
+            Constants.RobotConstants.ROBOT_MOI,
             new ModuleConfig(
                     TunerConstants.FrontLeft.WheelRadius,
                     TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
-                    WHEEL_COF,
+                    Constants.RobotConstants.WHEEL_COF,
                     DCMotor.getKrakenX60Foc(1).withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
                     TunerConstants.FrontLeft.SlipCurrent,
                     1),
@@ -89,14 +89,20 @@ public class Drive extends SubsystemBase {
                 new SwerveModulePosition(),
                 new SwerveModulePosition()
             };
-    private SwerveDrivePoseEstimator poseEstimator =
-            new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
     private PIDController xController = new PIDController(5, 0, 0);
     private PIDController yController = new PIDController(5, 0, 0);
     private PIDController headingController = new PIDController(5, 0, 0);
 
-    public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO, ModuleIO brModuleIO) {
+    private final Consumer<Pose2d> resetSimulationPoseCallback;
+
+    public Drive(
+            GyroIO gyroIO,
+            ModuleIO flModuleIO,
+            ModuleIO frModuleIO,
+            ModuleIO blModuleIO,
+            ModuleIO brModuleIO,
+            Consumer<Pose2d> resetSimulationPoseCallback) {
         this.gyroIO = gyroIO;
         modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
         modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
@@ -134,6 +140,8 @@ public class Drive extends SubsystemBase {
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
         headingController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
+
+        this.resetSimulationPoseCallback = resetSimulationPoseCallback;
     }
 
     @Override
@@ -184,8 +192,11 @@ public class Drive extends SubsystemBase {
                 rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
             }
 
-            // Apply update
-            poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+            RobotState.getInstance()
+                    .addOdometryObservation(
+                            modulePositions,
+                            gyroInputs.connected ? Optional.of(rawGyroRotation) : Optional.empty(),
+                            sampleTimestamps[i]);
         }
 
         // Update gyro alert
@@ -196,12 +207,16 @@ public class Drive extends SubsystemBase {
         Pose2d pose = getPose();
 
         // Generate the next speeds for the robot
-        ChassisSpeeds speeds = new ChassisSpeeds(
-                sample.vx + xController.calculate(pose.getX(), sample.x),
-                sample.vy + yController.calculate(pose.getY(), sample.y),
-                sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+        // ChassisSpeeds speeds = new ChassisSpeeds(
+        //         sample.vx + xController.calculate(pose.getX(), sample.x),
+        //         sample.vy + yController.calculate(pose.getY(), sample.y),
+        //         sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+
+        ChassisSpeeds speeds = new ChassisSpeeds(sample.vx, sample.vy, sample.omega);
 
         runVelocity(speeds);
+        RobotState.getInstance()
+                .setChoreoSetpoint(new Pose2d(sample.x, sample.y, Rotation2d.fromRadians(sample.heading)));
     }
 
     /**
@@ -309,7 +324,7 @@ public class Drive extends SubsystemBase {
     /** Returns the current odometry pose. */
     @AutoLogOutput(key = "Odometry/Robot")
     public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
+        return RobotState.getInstance().getEstimatedPose();
     }
 
     /** Returns the current odometry rotation. */
@@ -319,13 +334,18 @@ public class Drive extends SubsystemBase {
 
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
-        poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+        RobotState.getInstance().resetPose(pose);
+        resetSimulationPoseCallback.accept(pose);
     }
 
     /** Adds a new timestamped vision measurement. */
     public void addVisionMeasurement(
-            Pose2d visionRobotPoseMeters, double timestampSeconds, Matrix<N3, N1> visionMeasurementStdDevs) {
-        poseEstimator.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+            int camIndex,
+            Pose2d visionRobotPoseMeters,
+            double timestampSeconds,
+            Matrix<N3, N1> visionMeasurementStdDevs) {
+        RobotState.getInstance()
+                .addVisionObservation(camIndex, visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
     /** Returns the maximum linear speed in meters per sec. */

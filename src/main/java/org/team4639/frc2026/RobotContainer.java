@@ -17,9 +17,10 @@ import org.team4639.frc2026.commands.DriveCommands;
 import org.team4639.frc2026.subsystems.drive.Drive;
 import org.team4639.frc2026.subsystems.drive.GyroIO;
 import org.team4639.frc2026.subsystems.drive.GyroIOPigeon2;
+import org.team4639.frc2026.subsystems.drive.GyroIOSim;
 import org.team4639.frc2026.subsystems.drive.ModuleIO;
-import org.team4639.frc2026.subsystems.drive.ModuleIOSim;
 import org.team4639.frc2026.subsystems.drive.ModuleIOTalonFX;
+import org.team4639.frc2026.subsystems.drive.ModuleIOTalonFXSim;
 import org.team4639.frc2026.subsystems.drive.generated.TunerConstants;
 
 /**
@@ -50,7 +51,8 @@ public class RobotContainer {
                         new ModuleIOTalonFX(TunerConstants.FrontLeft),
                         new ModuleIOTalonFX(TunerConstants.FrontRight),
                         new ModuleIOTalonFX(TunerConstants.BackLeft),
-                        new ModuleIOTalonFX(TunerConstants.BackRight));
+                        new ModuleIOTalonFX(TunerConstants.BackRight),
+                        pose -> {});
 
                 // The ModuleIOTalonFXS implementation provides an example implementation for
                 // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -73,18 +75,45 @@ public class RobotContainer {
 
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
+
+                SimRobot.getInstance().setupDriveSim();
+
                 drive = new Drive(
-                        new GyroIO() {},
-                        new ModuleIOSim(TunerConstants.FrontLeft),
-                        new ModuleIOSim(TunerConstants.FrontRight),
-                        new ModuleIOSim(TunerConstants.BackLeft),
-                        new ModuleIOSim(TunerConstants.BackRight));
+                        new GyroIOSim(SimRobot.getInstance()
+                                .getSwerveDriveSimulation()
+                                .getGyroSimulation()),
+                        new ModuleIOTalonFXSim(
+                                TunerConstants.FrontLeft,
+                                SimRobot.getInstance()
+                                        .getSwerveDriveSimulation()
+                                        .getModules()[0]),
+                        new ModuleIOTalonFXSim(
+                                TunerConstants.FrontRight,
+                                SimRobot.getInstance()
+                                        .getSwerveDriveSimulation()
+                                        .getModules()[1]),
+                        new ModuleIOTalonFXSim(
+                                TunerConstants.BackLeft,
+                                SimRobot.getInstance()
+                                        .getSwerveDriveSimulation()
+                                        .getModules()[2]),
+                        new ModuleIOTalonFXSim(
+                                TunerConstants.BackRight,
+                                SimRobot.getInstance()
+                                        .getSwerveDriveSimulation()
+                                        .getModules()[3]),
+                        SimRobot.getInstance()::resetPose);
                 break;
 
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
+                        new GyroIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        pose -> {});
                 break;
         }
 
