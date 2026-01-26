@@ -206,6 +206,7 @@ public class Drive extends SubsystemBase {
     public void followTrajectory(SwerveSample sample) {
         Pose2d pose = getPose();
 
+        // TODO: why is this an issue
         // Generate the next speeds for the robot
         // ChassisSpeeds speeds = new ChassisSpeeds(
         //         sample.vx + xController.calculate(pose.getX(), sample.x),
