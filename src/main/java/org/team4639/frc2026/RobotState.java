@@ -27,6 +27,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants.Mode;
 import org.team4639.frc2026.subsystems.drive.Drive;
+import org.team4639.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.team4639.lib.util.VirtualSubsystem;
 import org.team4639.lib.util.geometry.AllianceFlipUtil;
 
@@ -38,7 +39,7 @@ import org.team4639.lib.util.geometry.AllianceFlipUtil;
  * however there are methods available to access the true on-field pose
  * mainly for interplay with vision, but they should be used sparingly.
  */
-public class RobotState extends VirtualSubsystem {
+public class RobotState extends VirtualSubsystem implements VisionConsumer {
     // Singleton
     private static RobotState instance = new RobotState();
 
@@ -198,10 +199,6 @@ public class RobotState extends VirtualSubsystem {
         addOdometryMeasurement(new OdometryObservation(wheelPositions, gyroAngle, timestamp));
     }
 
-    public void addVisionObservation(int camIndex, Pose2d visionPose, double timestamp, Matrix<N3, N1> stdDevs) {
-        addVisionObservation(new VisionObservation(camIndex, visionPose, timestamp, stdDevs));
-    }
-
     @Override
     public void periodic() {
         // Send RobotState Data to SmartDashboard
@@ -239,5 +236,19 @@ public class RobotState extends VirtualSubsystem {
         } else {
             return Optional.of(choreoSetpoints.getInternalBuffer().lastEntry().getValue());
         }
+    }
+
+    @Override
+    public void accept(
+            int cameraIndex,
+            Pose2d visionRobotPoseMeters,
+            double timestampSeconds,
+            Matrix<N3, N1> visionMeasurementStdDevs) {
+        // flip pose to get pose relative to our alliance wall
+        addVisionObservation(new VisionObservation(
+                cameraIndex,
+                AllianceFlipUtil.apply(visionRobotPoseMeters),
+                timestampSeconds,
+                visionMeasurementStdDevs));
     }
 }

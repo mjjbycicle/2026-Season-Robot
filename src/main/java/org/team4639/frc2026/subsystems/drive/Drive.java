@@ -345,8 +345,7 @@ public class Drive extends SubsystemBase {
             Pose2d visionRobotPoseMeters,
             double timestampSeconds,
             Matrix<N3, N1> visionMeasurementStdDevs) {
-        RobotState.getInstance()
-                .addVisionObservation(camIndex, visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+        RobotState.getInstance().accept(camIndex, visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     }
 
     /** Returns the maximum linear speed in meters per sec. */

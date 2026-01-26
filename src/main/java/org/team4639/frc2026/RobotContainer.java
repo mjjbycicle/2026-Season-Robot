@@ -20,7 +20,11 @@ import org.team4639.frc2026.subsystems.drive.ModuleIO;
 import org.team4639.frc2026.subsystems.drive.ModuleIOTalonFX;
 import org.team4639.frc2026.subsystems.drive.ModuleIOTalonFXSim;
 import org.team4639.frc2026.subsystems.drive.generated.TunerConstants;
+import org.team4639.frc2026.subsystems.vision.Vision;
+import org.team4639.frc2026.subsystems.vision.VisionConstants;
+import org.team4639.frc2026.subsystems.vision.VisionIOPhotonVisionSim;
 import org.team4639.lib.util.LoggedLazyAutoChooser;
+import org.team4639.lib.util.geometry.AllianceFlipUtil;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,6 +35,7 @@ import org.team4639.lib.util.LoggedLazyAutoChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
+    private final Vision vision;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -52,6 +57,9 @@ public class RobotContainer {
                         new ModuleIOTalonFX(TunerConstants.BackLeft),
                         new ModuleIOTalonFX(TunerConstants.BackRight),
                         pose -> {});
+
+                // No cameras on real robot yet
+                vision = new Vision(RobotState.getInstance());
 
                 // The ModuleIOTalonFXS implementation provides an example implementation for
                 // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -102,6 +110,21 @@ public class RobotContainer {
                                         .getSwerveDriveSimulation()
                                         .getModules()[3]),
                         SimRobot.getInstance()::resetPose);
+                // flip poses so that the vision sees the true on-field pose
+                vision = new Vision(
+                        RobotState.getInstance(),
+                        new VisionIOPhotonVisionSim(
+                                VisionConstants.camera0Name,
+                                VisionConstants.robotToCamera0,
+                                () -> AllianceFlipUtil.apply(SimRobot.getInstance()
+                                        .getSwerveDriveSimulation()
+                                        .getSimulatedDriveTrainPose())),
+                        new VisionIOPhotonVisionSim(
+                                VisionConstants.camera1Name,
+                                VisionConstants.robotToCamera1,
+                                () -> AllianceFlipUtil.apply(SimRobot.getInstance()
+                                        .getSwerveDriveSimulation()
+                                        .getSimulatedDriveTrainPose())));
                 break;
 
             default:
@@ -113,6 +136,8 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {},
                         pose -> {});
+
+                vision = new Vision(RobotState.getInstance());
                 break;
         }
 
