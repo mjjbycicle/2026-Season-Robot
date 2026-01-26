@@ -27,7 +27,8 @@ public class LoggedLazyAutoChooser extends VirtualSubsystem {
     @Getter
     @Accessors(fluent = true)
     /**
-     * Verify that the command has changed at least once since the start of the robot program.
+     * Verify that the command has changed at least once since the start of the robot program
+     * and is not the default option (Commands.none()).
      */
     private boolean hasCommand = false;
 
