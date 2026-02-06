@@ -1,24 +1,32 @@
-/* Copyright (c) 2025-2026 FRC 4639. */
-
 package org.team4639.lib.tunable;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.util.function.DoubleConsumer;
-import java.util.function.Supplier;
 import org.team4639.lib.functional.DoubleConsumer2;
 import org.team4639.lib.functional.DoubleSupplier2;
 
+import java.util.function.DoubleConsumer;
+import java.util.function.Supplier;
+
 /**
- * Creates a number tunable through SmartDashboard. This is generally not recommended for use, as
- * most of its use cases (PID gains) are themselves instances of {@link Sendable} and are much
- * easier to tune using their {@link Sendable#initSendable(SendableBuilder)} methods.
+ * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
+ * value not in dashboard.
  *
- * <p>This is equivalent to creating a {@link Sendable} containing just one number.
+ * @author elliot
  */
 public class TunableNumber implements Sendable, DoubleSupplier2, Supplier<Double> {
     private double value;
+    private boolean hasChanged = false;
+
+    public TunableNumber(double value) {
+        this.value = value;
+    }
+
+    public TunableNumber() {
+        this(0);
+    }
+
     private DoubleConsumer sendableConsumer = new DoubleConsumer2() {
 
         /**
@@ -28,6 +36,7 @@ public class TunableNumber implements Sendable, DoubleSupplier2, Supplier<Double
          */
         @Override
         public void accept(double value) {
+            hasChanged = TunableNumber.this.value != value;
             TunableNumber.this.value = value;
         }
     };
@@ -39,11 +48,6 @@ public class TunableNumber implements Sendable, DoubleSupplier2, Supplier<Double
 
     public void addDoubleConsumer(DoubleConsumer consumer) {
         sendableConsumer = sendableConsumer.andThen(consumer);
-    }
-
-    public TunableNumber withDefaultValue(double defaultValue) {
-        if (this.get() == null || this.get() == 0) this.value = defaultValue;
-        return this;
     }
 
     /**
@@ -74,5 +78,9 @@ public class TunableNumber implements Sendable, DoubleSupplier2, Supplier<Double
     @Override
     public Double get() {
         return value;
+    }
+
+    public boolean hasChanged() {
+        return hasChanged;
     }
 }
