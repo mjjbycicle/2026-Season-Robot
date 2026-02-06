@@ -1,9 +1,4 @@
-// Copyright (c) 2023 FRC 254
-// https://github.com/Team254/FRC-2023-Public
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project.
+/* Copyright (c) 2025-2026 FRC 4639. */
 
 package org.team4639.lib.util;
 

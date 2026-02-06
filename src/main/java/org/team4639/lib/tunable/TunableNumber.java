@@ -1,13 +1,14 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.lib.tunable;
 
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.team4639.lib.functional.DoubleConsumer2;
-import org.team4639.lib.functional.DoubleSupplier2;
-
 import java.util.function.DoubleConsumer;
 import java.util.function.Supplier;
+import org.team4639.lib.functional.DoubleConsumer2;
+import org.team4639.lib.functional.DoubleSupplier2;
 
 /**
  * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or

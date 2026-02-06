@@ -1,3 +1,5 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.shooter;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -36,10 +38,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         config.Voltage.PeakReverseVoltage = -12.0;
         config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.02;
 
-        updateGains();
-
-        PhoenixUtil.tryUntilOk(5, () -> leftShooter.getConfigurator().apply(config));
-        PhoenixUtil.tryUntilOk(5, () -> rightShooter.getConfigurator().apply(config));
+        applyNewGains();
 
         leftShooter.setControl(new Follower(rightShooter.getDeviceID(), MotorAlignmentValue.Opposed));
     }
@@ -69,17 +68,15 @@ public class ShooterIOTalonFX implements ShooterIO {
     }
 
     @Override
-    public void setVoltage(double leftAppliedVolts, double rightAppliedVolts) {
-        rightShooter.setControl(shooterVoltageControl.withOutput(rightAppliedVolts));
+    public void setVoltage(double appliedVolts) {
+        rightShooter.setControl(shooterVoltageControl.withOutput(appliedVolts));
     }
 
     @Override
-    public void setRPM(double leftTargetRPM, double rightTargetRPM) {
+    public void setRPM(double targetRPM) {
+        double applied = targetRPM * SHOOTER_GEAR_RATIO / 60.0;
 
-        double leftApplied = leftTargetRPM * SHOOTER_GEAR_RATIO / 60.0;
-        double rightApplied = rightTargetRPM * SHOOTER_GEAR_RATIO / 60.0;
-
-        rightShooter.setControl(shooterVelocityControl.withVelocity(rightApplied));
+        rightShooter.setControl(shooterVelocityControl.withVelocity(applied));
     }
 
     public void updateGains() {
@@ -93,6 +90,7 @@ public class ShooterIOTalonFX implements ShooterIO {
 
     @Override
     public void applyNewGains() {
+        updateGains();
         PhoenixUtil.tryUntilOk(5, () -> leftShooter.getConfigurator().apply(config));
         PhoenixUtil.tryUntilOk(5, () -> rightShooter.getConfigurator().apply(config));
     }

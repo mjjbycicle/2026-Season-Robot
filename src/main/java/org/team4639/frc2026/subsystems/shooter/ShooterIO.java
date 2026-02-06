@@ -1,12 +1,14 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.shooter;
 
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterIO {
 
-    default void setVoltage(double leftAppliedVolts, double rightAppliedVolts) {}
+    default void setVoltage(double appliedVolts) {}
 
-    default void setRPM(double leftTargetRPM, double rightTargetRPM) {}
+    default void setRPM(double targetRPM) {}
 
     default void updateInputs(ShooterIOInputs inputs) {}
 
