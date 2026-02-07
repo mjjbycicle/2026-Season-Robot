@@ -10,9 +10,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import org.team4639.frc2026.util.PhoenixUtil;
 import org.team4639.frc2026.util.PortConfiguration;
-import org.team4639.lib.util.PhoenixUtil;
-import org.team4639.lib.util.TalonFXFactory;
+import org.team4639.lib.util.Phoenix6Factory;
 
 public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX leftShooter;
@@ -27,8 +27,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final double SHOOTER_GEAR_RATIO = 1.0;
 
     public ShooterIOTalonFX(PortConfiguration ports) {
-        leftShooter = TalonFXFactory.createDefaultTalon(ports.shooterMotorLeftID);
-        rightShooter = TalonFXFactory.createDefaultTalon(ports.shooterMotorRightID);
+        leftShooter = Phoenix6Factory.createDefaultTalon(ports.shooterMotorLeftID);
+        rightShooter = Phoenix6Factory.createDefaultTalon(ports.shooterMotorRightID);
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
         config.CurrentLimits.SupplyCurrentLimit = 40;
