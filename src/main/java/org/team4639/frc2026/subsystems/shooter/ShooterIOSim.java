@@ -1,3 +1,5 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.shooter;
 
 import edu.wpi.first.math.MathUtil;
@@ -9,14 +11,9 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 public class ShooterIOSim implements ShooterIO {
 
     private final FlywheelSim flywheelSim = new FlywheelSim(
-            LinearSystemId.createFlywheelSystem(
-                    DCMotor.getNeoVortex(2),
-                    0.00117 * 3,
-                    1
-            ),
+            LinearSystemId.createFlywheelSystem(DCMotor.getNeoVortex(2), 0.00117 * 3, 1),
             DCMotor.getNeoVortex(2),
-            0.025
-    );
+            0.025);
 
     private final PIDController flywheelFeedback = new PIDController(1.5, 0, 0.5);
 

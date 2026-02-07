@@ -93,11 +93,11 @@ public class Shooter extends SubsystemBase {
         io.setVoltage(IDLE_VOLTAGE);
     }
 
-    private void setWantedState(WantedState wantedState) {
+    public void setWantedState(WantedState wantedState) {
         this.wantedState = wantedState;
     }
 
-    private void setWantedState(WantedState wantedState, double scoringRPM) {
+    public void setWantedState(WantedState wantedState, double scoringRPM) {
         setWantedState(wantedState);
         this.SCORING_RPM = scoringRPM;
     }

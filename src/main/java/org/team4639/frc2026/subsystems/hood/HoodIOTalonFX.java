@@ -1,4 +1,8 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.hood;
+
+import static org.team4639.frc2026.subsystems.hood.Constants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -12,8 +16,6 @@ import org.team4639.frc2026.subsystems.shooter.PIDs;
 import org.team4639.frc2026.util.PhoenixUtil;
 import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.Phoenix6Factory;
-
-import static org.team4639.frc2026.subsystems.hood.Constants.*;
 
 public class HoodIOTalonFX implements HoodIO {
     private final TalonFX hoodMotor;

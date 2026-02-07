@@ -2,6 +2,9 @@
 
 package org.team4639.frc2026.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.RevolutionsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase;
@@ -15,9 +18,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import org.team4639.frc2026.util.PortConfiguration;
-
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
 
 public class ShooterIOSparkFlex implements ShooterIO {
     private final SparkFlex leftShooter;
