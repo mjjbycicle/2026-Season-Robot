@@ -1,6 +1,6 @@
 /* Copyright (c) 2025-2026 FRC 4639. */
 
-package org.team4639.frc2026.subsystems.kicker;
+package org.team4639.frc2026.subsystems.spindexer;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -11,14 +11,14 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.Phoenix6Factory;
 
-public class KickerIOTalonFX implements KickerIO {
-    private final TalonFX kickerMotor;
+public class SpindexerIOTalonFX implements SpindexerIO {
+    private final TalonFX spindexerMotor;
 
     private final VoltageOut voltageControl = new VoltageOut(0);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-    public KickerIOTalonFX(PortConfiguration ports) {
-        kickerMotor = Phoenix6Factory.createDefaultTalon(ports.KickerMotorID, false);
+    public SpindexerIOTalonFX(PortConfiguration ports) {
+        spindexerMotor = Phoenix6Factory.createDefaultTalon(ports.KickerMotorID, false);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -27,30 +27,30 @@ public class KickerIOTalonFX implements KickerIO {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 80;
 
-        kickerMotor.getConfigurator().apply(config);
+        spindexerMotor.getConfigurator().apply(config);
     }
 
     @Override
-    public void updateInputs(KickerIOInputs inputs) {
+    public void updateInputs(SpindexerIOInputs inputs) {
         inputs.motorConnected = BaseStatusSignal.refreshAll(
-                kickerMotor.getMotorVoltage(),
-                kickerMotor.getStatorCurrent(),
-                kickerMotor.getVelocity(),
-                kickerMotor.getDeviceTemp()
+                spindexerMotor.getMotorVoltage(),
+                spindexerMotor.getStatorCurrent(),
+                spindexerMotor.getVelocity(),
+                spindexerMotor.getDeviceTemp()
         ).isOK();
-        inputs.motorVoltage = kickerMotor.getMotorVoltage().getValueAsDouble();
-        inputs.motorCurrent = kickerMotor.getStatorCurrent().getValueAsDouble();
-        inputs.motorVelocity = kickerMotor.getVelocity().getValueAsDouble();
-        inputs.motorTemperature = kickerMotor.getDeviceTemp().getValueAsDouble();
+        inputs.motorVoltage = spindexerMotor.getMotorVoltage().getValueAsDouble();
+        inputs.motorCurrent = spindexerMotor.getStatorCurrent().getValueAsDouble();
+        inputs.motorVelocity = spindexerMotor.getVelocity().getValueAsDouble();
+        inputs.motorTemperature = spindexerMotor.getDeviceTemp().getValueAsDouble();
     }
 
     @Override
     public void setVoltage(double appliedVoltage)  {
-        kickerMotor.setControl(voltageControl.withOutput(appliedVoltage));
+        spindexerMotor.setControl(voltageControl.withOutput(appliedVoltage));
     }
 
     @Override
     public void setRotorVelocityRPM(double targetVelocity) {
-        kickerMotor.setControl(velocityControl.withVelocity(targetVelocity / 60));
+        spindexerMotor.setControl(velocityControl.withVelocity(targetVelocity / 60));
     }
 }
