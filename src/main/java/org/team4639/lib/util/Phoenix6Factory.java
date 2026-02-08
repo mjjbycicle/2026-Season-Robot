@@ -3,16 +3,17 @@
 package org.team4639.lib.util;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 import org.team4639.frc2026.util.CanDeviceId;
+import org.team4639.frc2026.util.PhoenixUtil;
 
 /**
  * Creates FXTalons objects and configures all the parameters we care about to factory defaults.
  * Closed-loop and sensor parameters are not set, as these are expected to be set by the application.
  */
-public class TalonFXFactory {
+public class Phoenix6Factory {
 
     public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Coast;
     public static final InvertedValue INVERT_VALUE = InvertedValue.CounterClockwise_Positive;
@@ -26,22 +27,12 @@ public class TalonFXFactory {
     public static TalonFX createDefaultTalon(CanDeviceId id, boolean triggerConfig) {
         var talon = createTalon(id);
         if (triggerConfig) {
-            PhoenixUtil.tryUntilOk(5, () -> talon.getConfigurator().apply(getDefaultConfig()));
+            PhoenixUtil.tryUntilOk(5, () -> talon.getConfigurator().apply(getTalonFXDefaultConfig()));
         }
         return talon;
     }
 
-    public static TalonFX createPermanentFollowerTalon(
-            CanDeviceId followerId, CanDeviceId masterId, boolean opposeMasterDirection) {
-        if (!followerId.getBus().equals(masterId.getBus())) {
-            throw new RuntimeException("Master and Follower TalonFXs must be on the same CAN bus.");
-        }
-        final TalonFX talon = createTalon(followerId);
-        talon.setControl(new Follower(masterId.getDeviceNumber(), MotorAlignmentValue.Opposed));
-        return talon;
-    }
-
-    public static TalonFXConfiguration getDefaultConfig() {
+    public static TalonFXConfiguration getTalonFXDefaultConfig() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.MotorOutput.NeutralMode = NEUTRAL_MODE;
@@ -83,5 +74,10 @@ public class TalonFXFactory {
         return talon;
     }
 
-    private TalonFXFactory() {}
+    public static CANcoder createCANcoder(CanDeviceId id) {
+        CANcoder cancoder = new CANcoder(id.getDeviceNumber(), id.getBus());
+        cancoder.clearStickyFaults();
+
+        return cancoder;
+    }
 }

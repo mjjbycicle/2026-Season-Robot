@@ -9,6 +9,7 @@ public class PortConfiguration {
     public CanDeviceId KickerMotorID;
     public CanDeviceId TurretMotorID;
     public CanDeviceId HoodMotorID;
+    public CanDeviceId HoodEncoderID;
     public CanDeviceId shooterMotorLeftID;
     public CanDeviceId shooterMotorRightID;
 }
