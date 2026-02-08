@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.Phoenix6Factory;
+import org.team4639.lib.util.PhoenixUtil;
 
 public class KickerIOTalonFX implements KickerIO {
     private final TalonFX kickerMotor;
@@ -27,7 +28,7 @@ public class KickerIOTalonFX implements KickerIO {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 80;
 
-        kickerMotor.getConfigurator().apply(config);
+        PhoenixUtil.tryUntilOk(5, () -> kickerMotor.getConfigurator().apply(config));
     }
 
     @Override

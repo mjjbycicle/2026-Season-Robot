@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.Phoenix6Factory;
+import org.team4639.lib.util.PhoenixUtil;
 
 public class SpindexerIOTalonFX implements SpindexerIO {
     private final TalonFX spindexerMotor;
@@ -27,7 +28,7 @@ public class SpindexerIOTalonFX implements SpindexerIO {
         config.CurrentLimits.StatorCurrentLimitEnable = true;
         config.CurrentLimits.StatorCurrentLimit = 80;
 
-        spindexerMotor.getConfigurator().apply(config);
+        PhoenixUtil.tryUntilOk(5, () -> spindexerMotor.getConfigurator().apply(config));
     }
 
     @Override
