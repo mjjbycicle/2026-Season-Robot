@@ -6,13 +6,12 @@ import static org.team4639.frc2026.subsystems.hood.Constants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
-import org.team4639.frc2026.subsystems.shooter.PIDs;
 import org.team4639.frc2026.util.PhoenixUtil;
 import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.Phoenix6Factory;
@@ -23,10 +22,10 @@ public class HoodIOTalonFX implements HoodIO {
 
     private final TalonFXConfiguration config = new TalonFXConfiguration();
 
-    private final PositionDutyCycle request = new PositionDutyCycle(0);
+    private final PositionVoltage request = new PositionVoltage(0);
 
     public HoodIOTalonFX(PortConfiguration ports) {
-        hoodMotor = Phoenix6Factory.createDefaultTalon(ports.HoodMotorID, false);
+        hoodMotor = Phoenix6Factory.createDefaultTalon(ports.HoodMotorID);
         hoodEncoder = Phoenix6Factory.createCANcoder(ports.HoodEncoderID);
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
@@ -65,12 +64,12 @@ public class HoodIOTalonFX implements HoodIO {
     }
 
     public void updateGains() {
-        config.Slot0.kP = org.team4639.frc2026.subsystems.shooter.PIDs.shooterKp.get();
-        config.Slot0.kI = org.team4639.frc2026.subsystems.shooter.PIDs.shooterKi.get();
-        config.Slot0.kD = org.team4639.frc2026.subsystems.shooter.PIDs.shooterKd.get();
-        config.Slot0.kS = org.team4639.frc2026.subsystems.shooter.PIDs.shooterKs.get();
-        config.Slot0.kV = org.team4639.frc2026.subsystems.shooter.PIDs.shooterKv.get();
-        config.Slot0.kA = PIDs.shooterKa.get();
+        config.Slot0.kP = PIDs.hoodKp.get();
+        config.Slot0.kI = PIDs.hoodKi.get();
+        config.Slot0.kD = PIDs.hoodKd.get();
+        config.Slot0.kS = PIDs.hoodKs.get();
+        config.Slot0.kV = PIDs.hoodKv.get();
+        config.Slot0.kA = PIDs.hoodKa.get();
     }
 
     @Override

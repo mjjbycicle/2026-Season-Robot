@@ -20,8 +20,6 @@ public class ShooterIOSim implements ShooterIO {
     private double leftAppliedVolts = 0.0;
     private double rightAppliedVolts = 0.0;
 
-    private static final double ROLLER_RADIUS_METERS = 0.0508;
-
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         inputs.leftVoltage = leftAppliedVolts;

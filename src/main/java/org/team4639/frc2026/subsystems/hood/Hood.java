@@ -28,7 +28,7 @@ public class Hood extends SubsystemBase {
         PASSING
     }
 
-    private WantedState wantedState =  WantedState.IDLE;
+    private WantedState wantedState = WantedState.IDLE;
     private SystemState systemState = SystemState.IDLE;
 
     public Hood(HoodIO io, RobotState state) {
@@ -40,6 +40,7 @@ public class Hood extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Hood", inputs);
+
         SystemState newState = handleStateTransitions();
         if (newState != systemState) {
             Logger.recordOutput("Hood/SystemState", newState.toString());
