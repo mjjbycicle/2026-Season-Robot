@@ -4,6 +4,7 @@ package org.team4639.frc2026;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,10 +24,18 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
+import lombok.Setter;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants.Mode;
 import org.team4639.frc2026.subsystems.drive.Drive;
+import org.team4639.frc2026.subsystems.hood.Hood;
+import org.team4639.frc2026.subsystems.hood.HoodIO;
+import org.team4639.frc2026.subsystems.shooter.Shooter;
+import org.team4639.frc2026.subsystems.shooter.ShooterIO;
+import org.team4639.frc2026.subsystems.turret.Turret;
+import org.team4639.frc2026.subsystems.turret.TurretIO;
 import org.team4639.frc2026.subsystems.vision.Vision.VisionConsumer;
 import org.team4639.lib.util.VirtualSubsystem;
 import org.team4639.lib.util.geometry.AllianceFlipUtil;
@@ -87,6 +96,13 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
     private final String CHOREO_SETPOINT_KEY = "/Internal/Choreo Setpoint";
 
     private final TimeInterpolatableBuffer<Pose2d> choreoSetpoints = TimeInterpolatableBuffer.createBuffer(0.05);
+
+    @Setter
+    private Pair<Hood.WantedState, Hood.SystemState> hoodStates;
+    @Setter
+    private Pair<Shooter.WantedState, Shooter.SystemState> shooterStates;
+    @Setter
+    private Pair<Turret.WantedState, Turret.SystemState> turretStates;
 
     /**
      * Returns the pose relative to the blue alliance wall.
@@ -250,5 +266,17 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
                 AllianceFlipUtil.apply(visionRobotPoseMeters),
                 timestampSeconds,
                 visionMeasurementStdDevs));
+    }
+
+    public void accept(ShooterIO.ShooterIOInputs inputs){
+        // TODO: something with this
+    }
+
+    public void accept(HoodIO.HoodIOInputs inputs){
+        //TODO: something with this
+    }
+
+    public void accept(TurretIO.TurretIOInputs inputs){
+        //TODO: something with this
     }
 }

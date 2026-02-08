@@ -2,12 +2,14 @@
 
 package org.team4639.frc2026.subsystems.hood;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
+import org.team4639.lib.util.FullSubsystem;
 
-public class Hood extends SubsystemBase {
+public class Hood extends FullSubsystem {
     private final RobotState state;
     private final HoodIO io;
     private final HoodIOInputsAutoLogged inputs = new HoodIOInputsAutoLogged();
@@ -62,6 +64,12 @@ public class Hood extends SubsystemBase {
                 handlePassing();
                 break;
         }
+    }
+
+    @Override
+    public void periodicAfterScheduler() {
+        RobotState.getInstance().setHoodStates(new Pair<Hood.WantedState,Hood.SystemState>(wantedState, systemState));
+        RobotState.getInstance().accept(inputs);
     }
 
     private SystemState handleStateTransitions() {

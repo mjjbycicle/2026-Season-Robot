@@ -2,12 +2,14 @@
 
 package org.team4639.frc2026.subsystems.shooter;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
+import org.team4639.lib.util.FullSubsystem;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends FullSubsystem {
     private final RobotState state;
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -66,6 +68,12 @@ public class Shooter extends SubsystemBase {
                 handlePassing();
                 break;
         }
+    }
+
+    @Override
+    public void periodicAfterScheduler() {
+        RobotState.getInstance().setShooterStates(new Pair<Shooter.WantedState,Shooter.SystemState>(wantedState, systemState));
+        RobotState.getInstance().accept(inputs);
     }
 
     private SystemState handleStateTransitions() {

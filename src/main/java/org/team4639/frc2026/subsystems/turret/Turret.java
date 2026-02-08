@@ -3,12 +3,14 @@
 package org.team4639.frc2026.subsystems.turret;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
+import org.team4639.lib.util.FullSubsystem;
 
-public class Turret extends SubsystemBase {
+public class Turret extends FullSubsystem {
     private final RobotState state;
     private final TurretIO turretIO;
     private final EncoderIO leftEncoderIO, rightEncoderIO;
@@ -81,6 +83,12 @@ public class Turret extends SubsystemBase {
                 handlePassing();
                 break;
         }
+    }
+
+    @Override
+    public void periodicAfterScheduler() {
+        RobotState.getInstance().setTurretStates(new Pair<Turret.WantedState,Turret.SystemState>(wantedState, systemState));
+        RobotState.getInstance().accept(turretInputs);
     }
 
     private SystemState handleStateTransitions() {
