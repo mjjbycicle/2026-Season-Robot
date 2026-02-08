@@ -3,8 +3,12 @@
 package org.team4639.frc2026.subsystems.hood;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import lombok.Getter;
+
+import static edu.wpi.first.units.Units.Volts;
+
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
@@ -18,6 +22,11 @@ public class Hood extends FullSubsystem {
     private final double PASSING_HOOD_ANGLE = 0;
     private final double IDLE_HOOD_ANGLE = 0;
     private double SCORING_HOOD_ANGLE = 0;
+
+    // Handle SysID and any other reasons not to use state
+    @Getter
+    private final HoodSysID sysID = new HoodSysID.HoodSysIDWPI(this, inputs);
+    private final boolean usingStates = true;
 
     public enum WantedState {
         IDLE,
@@ -54,7 +63,7 @@ public class Hood extends FullSubsystem {
             systemState = SystemState.IDLE;
         }
 
-        switch (systemState) {
+        if (usingStates) switch (systemState) {
             case IDLE:
                 handleIdle();
                 break;
@@ -77,6 +86,7 @@ public class Hood extends FullSubsystem {
 
     @Override
     public void periodicAfterScheduler() {
+        //TODO: use PIV state
         RobotState.getInstance().setHoodStates(new Pair<Hood.WantedState,Hood.SystemState>(wantedState, systemState));
         RobotState.getInstance().accept(inputs);
     }
@@ -108,5 +118,14 @@ public class Hood extends FullSubsystem {
     public void setWantedState(WantedState wantedState, double scoringAngle) {
         setWantedState(wantedState);
         this.SCORING_HOOD_ANGLE = scoringAngle;
+    }
+
+    /**
+     * Should not be called in comp code. All usages of 
+     * setVoltage() needed for comp should be called internally.
+     * @param volts
+     */
+    public void setVoltage(Voltage volts){
+        if (!usingStates) io.setVoltage(volts.in(Volts));
     }
 }

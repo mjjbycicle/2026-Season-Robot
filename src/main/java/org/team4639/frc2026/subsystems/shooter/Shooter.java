@@ -3,8 +3,12 @@
 package org.team4639.frc2026.subsystems.shooter;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.Volts;
+
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants;
 import org.team4639.frc2026.RobotState;
@@ -19,6 +23,9 @@ public class Shooter extends FullSubsystem {
     private final double PASSING_RPM = 0;
     private final double IDLE_VOLTAGE = 0;
     private double SCORING_RPM = 0;
+
+    private final boolean usingStates = true;
+    private final ShooterSysID sysID = new ShooterSysID.ShooterSysIDWPI(this, inputs);
 
     public enum WantedState {
         OFF,
@@ -118,5 +125,14 @@ public class Shooter extends FullSubsystem {
     public void setWantedState(WantedState wantedState, double scoringRPM) {
         setWantedState(wantedState);
         this.SCORING_RPM = scoringRPM;
+    }
+
+    /**
+     * Should not be called in comp code. All usages of 
+     * setVoltage() needed for comp should be called internally.
+     * @param volts
+     */
+    public void setVoltage(Voltage volts) {
+        if (!usingStates) io.setVoltage(volts.in(Volts));
     }
 }

@@ -53,6 +53,8 @@ public class ShooterIOSparkFlex implements ShooterIO {
                 .appliedOutputPeriodMs(5)
                 .busVoltagePeriodMs(5)
                 .outputCurrentPeriodMs(5);
+        
+        shooterConfig.encoder.velocityConversionFactor(1.0 / 60.0); // convert REV native RPM to RPS, better for velocity PID on spark
 
         leftShooter = new SparkFlex(ports.shooterMotorLeftID.getDeviceNumber(), SparkLowLevel.MotorType.kBrushless);
         rightShooter = new SparkFlex(ports.shooterMotorRightID.getDeviceNumber(), SparkLowLevel.MotorType.kBrushless);
@@ -79,6 +81,8 @@ public class ShooterIOSparkFlex implements ShooterIO {
         inputs.rightTemperature = rightShooter.getMotorTemperature();
         inputs.leftRPM = (leftShooter.getEncoder().getVelocity() * 60) / SHOOTER_GEAR_RATIO;
         inputs.rightRPM = (rightShooter.getEncoder().getVelocity() * 60) / SHOOTER_GEAR_RATIO;
+        inputs.leftRotations = (leftShooter.getEncoder().getPosition() / SHOOTER_GEAR_RATIO);
+        inputs.rightRotations = (rightShooter.getEncoder().getPosition() / SHOOTER_GEAR_RATIO);
     }
 
     @Override

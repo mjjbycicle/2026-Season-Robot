@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface HoodIO {
     default void setSetpointDegrees(double setpointDegrees) {}
 
+    default void setVoltage(double volts) {}
+
     default void updateInputs(HoodIOInputs inputs) {}
 
     default void applyNewGains() {}
