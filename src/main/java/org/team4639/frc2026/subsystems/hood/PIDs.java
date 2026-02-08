@@ -2,13 +2,13 @@
 
 package org.team4639.frc2026.subsystems.hood;
 
-import org.team4639.lib.tunable.TunableNumber;
+import org.team4639.lib.util.LoggedTunableNumber;
 
 public class PIDs {
-    public static final TunableNumber hoodKp = new TunableNumber(0);
-    public static final TunableNumber hoodKi = new TunableNumber(0);
-    public static final TunableNumber hoodKd = new TunableNumber(0);
-    public static final TunableNumber hoodKs = new TunableNumber(0);
-    public static final TunableNumber hoodKv = new TunableNumber(0);
-    public static final TunableNumber hoodKa = new TunableNumber(0);
+    public static final LoggedTunableNumber hoodKp = new LoggedTunableNumber("Hood/kP").initDefault(0);
+    public static final LoggedTunableNumber hoodKi = new LoggedTunableNumber("Hood/kI").initDefault(0);
+    public static final LoggedTunableNumber hoodKd = new LoggedTunableNumber("Hood/kD").initDefault(0);
+    public static final LoggedTunableNumber hoodKs = new LoggedTunableNumber("Hood/kS").initDefault(0);
+    public static final LoggedTunableNumber hoodKv = new LoggedTunableNumber("Hood/kV").initDefault(0);
+    public static final LoggedTunableNumber hoodKa = new LoggedTunableNumber("Hood/kA").initDefault(0);
 }

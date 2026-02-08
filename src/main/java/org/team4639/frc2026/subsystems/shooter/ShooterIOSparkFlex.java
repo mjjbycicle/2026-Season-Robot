@@ -18,6 +18,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import org.team4639.frc2026.util.PortConfiguration;
+import org.team4639.lib.util.LoggedTunableNumber;
 
 public class ShooterIOSparkFlex implements ShooterIO {
     private final SparkFlex leftShooter;

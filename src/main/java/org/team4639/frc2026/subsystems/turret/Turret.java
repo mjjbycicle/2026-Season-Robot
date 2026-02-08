@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
+import org.team4639.lib.util.LoggedTunableNumber;
 
 public class Turret extends FullSubsystem {
     private final RobotState state;
@@ -82,6 +83,14 @@ public class Turret extends FullSubsystem {
             case PASSING:
                 handlePassing();
                 break;
+        }
+
+        if (org.team4639.frc2026.Constants.tuningMode) {
+            LoggedTunableNumber.ifChanged(
+                hashCode(), turretIO::applyNewGains, 
+                PIDs.turretKp, PIDs.turretKi, PIDs.turretKd, 
+                PIDs.turretKs, PIDs.turretKv, PIDs.turretKa
+            );
         }
     }
 

@@ -6,8 +6,10 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
+import org.team4639.frc2026.Constants;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
+import org.team4639.lib.util.LoggedTunableNumber;
 
 public class Shooter extends FullSubsystem {
     private final RobotState state;
@@ -67,6 +69,14 @@ public class Shooter extends FullSubsystem {
             case PASSING:
                 handlePassing();
                 break;
+        }
+
+        if (Constants.tuningMode) {
+            LoggedTunableNumber.ifChanged(
+                hashCode(), io::applyNewGains, 
+                PIDs.shooterKp, PIDs.shooterKi, PIDs.shooterKd, 
+                PIDs.shooterKs, PIDs.shooterKv, PIDs.shooterKa
+            );
         }
     }
 
