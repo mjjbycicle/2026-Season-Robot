@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2026.1.1"
+    id "edu.wpi.first.GradleRIO" version "2026.2.1"
     id "com.peterabeles.gversion" version "1.10"
     id "com.diffplug.spotless" version "6.12.0"
     id "io.freefair.lombok" version "8.4"
@@ -190,8 +190,6 @@ spotless {
             exclude "**/build/**", "**/build-*/**"
         }
         toggleOffOn()
-        palantirJavaFormat()
-        removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
         licenseHeader("/* Copyright (c) 2025-2026 FRC 4639. */\n\n")
