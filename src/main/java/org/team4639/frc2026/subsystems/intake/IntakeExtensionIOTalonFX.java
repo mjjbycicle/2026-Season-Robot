@@ -1,5 +1,8 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.intake;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,5 +28,29 @@ public class IntakeExtensionIOTalonFX implements IntakeExtensionIO {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         PhoenixUtil.tryUntilOk(5, () -> extensionMotor.getConfigurator().apply(config));
+    }
+
+    @Override
+    public void updateInputs(IntakeExtensionIOInputs inputs) {
+        inputs.connected = BaseStatusSignal.refreshAll(
+                extensionMotor.getMotorVoltage(),
+                extensionMotor.getStatorCurrent(),
+                extensionMotor.getDeviceTemp(),
+                extensionMotor.getVelocity()
+        ).isOK();
+        inputs.voltage = extensionMotor.getMotorVoltage().getValueAsDouble();
+        inputs.current = extensionMotor.getStatorCurrent().getValueAsDouble();
+        inputs.temperature = extensionMotor.getDeviceTemp().getValueAsDouble();
+        inputs.velocity = extensionMotor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
+    public void setVoltage(double appliedVoltage) {
+        extensionMotor.setControl(request.withOutput(appliedVoltage));
+    }
+
+    @Override
+    public void stop() {
+        extensionMotor.stopMotor();
     }
 }
