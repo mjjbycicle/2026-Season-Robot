@@ -5,7 +5,6 @@ package org.team4639.frc2026.subsystems.turret;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
@@ -25,7 +24,7 @@ public class Turret extends FullSubsystem {
     private double PASSING_TURRET_ROTATION = 0;
 
     private final double initialTurretRotation;
-    private final double initialMotorRotation;
+    private final double initialRotorRotation;
 
     public enum WantedState {
         IDLE,
@@ -51,7 +50,7 @@ public class Turret extends FullSubsystem {
         leftEncoderIO.updateInputs(leftEncoderInputs);
         rightEncoderIO.updateInputs(rightEncoderInputs);
         initialTurretRotation = getTurretRotation();
-        initialMotorRotation = turretInputs.motorPositionRotations;
+        initialRotorRotation = turretInputs.motorPositionRotations;
     }
 
     @Override
@@ -87,8 +86,8 @@ public class Turret extends FullSubsystem {
 
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
-                hashCode(), turretIO::applyNewGains, 
-                PIDs.turretKp, PIDs.turretKi, PIDs.turretKd, 
+                hashCode(), turretIO::applyNewGains,
+                PIDs.turretKp, PIDs.turretKi, PIDs.turretKd,
                 PIDs.turretKs, PIDs.turretKv, PIDs.turretKa
             );
         }
@@ -108,6 +107,7 @@ public class Turret extends FullSubsystem {
         };
     }
 
+    // CRT, should only be used on startup to seed position and not while turret is moving
     public double getTurretRotation() {
         double leftEncoderRotations = leftEncoderInputs.positionRotations;
         double rightEncoderRotations = rightEncoderInputs.positionRotations;
@@ -129,13 +129,13 @@ public class Turret extends FullSubsystem {
         return (closestLeft + closestRight) / Constants.SHARED_GEAR_TO_TURRET_GEAR_RATIO;
     }
 
-    public double getMotorDeltaRotations(double turretDeltaRotations) {
+    public double getRotorDeltaRotations(double turretDeltaRotations) {
         return turretDeltaRotations / Constants.TURRET_TO_MOTOR_GEAR_RATIO;
     }
 
-    public double getMotorRotations(double targetTurretRotations) {
+    public double getRotorRotationsFromAbsoluteTurretRotation(double targetTurretRotations) {
         double turretDeltaRotations = targetTurretRotations - initialTurretRotation;
-        return initialMotorRotation + getMotorDeltaRotations(turretDeltaRotations);
+        return initialRotorRotation + getRotorDeltaRotations(turretDeltaRotations);
     }
 
     public double getNearestTurretRotation(double clampedRotation) {
@@ -154,17 +154,17 @@ public class Turret extends FullSubsystem {
     }
 
     private void handleIdle() {
-        turretIO.setRotorRotation(getMotorRotations(IDLE_TURRET_ROTATION));
+        turretIO.setRotorRotationSetpoint(getRotorRotationsFromAbsoluteTurretRotation(IDLE_TURRET_ROTATION));
     }
 
     private void handleScoring() {
         double nearestTurretRotation = getNearestTurretRotation(SCORING_TURRET_ROTATION);
-        turretIO.setRotorRotation(getMotorRotations(nearestTurretRotation));
+        turretIO.setRotorRotationSetpoint(getRotorRotationsFromAbsoluteTurretRotation(nearestTurretRotation));
     }
 
     private void handlePassing() {
         double nearestTurretRotation = getNearestTurretRotation(PASSING_TURRET_ROTATION);
-        turretIO.setRotorRotation(getMotorRotations(nearestTurretRotation));
+        turretIO.setRotorRotationSetpoint(getRotorRotationsFromAbsoluteTurretRotation(nearestTurretRotation));
     }
 
     public double getTurretSetpoint() {
@@ -176,7 +176,7 @@ public class Turret extends FullSubsystem {
     }
 
     public double getRotorSetpoint() {
-        return getMotorRotations(getTurretSetpoint());
+        return getRotorRotationsFromAbsoluteTurretRotation(getTurretSetpoint());
     }
 
     public boolean atSetpoint() {
