@@ -5,15 +5,13 @@ package org.team4639.frc2026.subsystems.shooter;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static edu.wpi.first.units.Units.Volts;
-
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTunableNumber;
+
+import static edu.wpi.first.units.Units.Volts;
 
 public class Shooter extends FullSubsystem {
     private final RobotState state;
@@ -89,7 +87,7 @@ public class Shooter extends FullSubsystem {
 
     @Override
     public void periodicAfterScheduler() {
-        RobotState.getInstance().setShooterStates(new Pair<Shooter.WantedState,Shooter.SystemState>(wantedState, systemState));
+        RobotState.getInstance().setShooterStates(new Pair<>(wantedState, systemState));
         RobotState.getInstance().accept(inputs);
     }
 
@@ -130,7 +128,7 @@ public class Shooter extends FullSubsystem {
     /**
      * Should not be called in comp code. All usages of 
      * setVoltage() needed for comp should be called internally.
-     * @param volts
+     * @param volts voltage to set shooter motors to
      */
     public void setVoltage(Voltage volts) {
         if (!usingStates) io.setVoltage(volts.in(Volts));
