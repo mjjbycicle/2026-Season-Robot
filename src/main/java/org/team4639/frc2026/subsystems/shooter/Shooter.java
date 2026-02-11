@@ -2,10 +2,16 @@
 
 package org.team4639.frc2026.subsystems.shooter;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
+import org.team4639.lib.tunable.TunableNumber;
+
+import static edu.wpi.first.units.Units.Volts;
 
 public class Shooter extends SubsystemBase {
     private final RobotState state;
@@ -15,6 +21,8 @@ public class Shooter extends SubsystemBase {
     private final double PASSING_RPM = 0;
     private final double IDLE_VOLTAGE = 0;
     private double SCORING_RPM = 0;
+
+    private final SysIdRoutine sysIdRoutine;
 
     public enum WantedState {
         OFF,
@@ -36,6 +44,20 @@ public class Shooter extends SubsystemBase {
     public Shooter(ShooterIO io, RobotState state) {
         this.io = io;
         this.state = state;
+
+        sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        null,
+                        null,
+                        null,
+                        sysIdState -> SignalLogger.writeString("SysIdShooter_State", sysIdState.toString())
+                ),
+                new SysIdRoutine.Mechanism(
+                        voltage -> io.setVoltage(voltage.in(Volts)),
+                        null,
+                        this
+                )
+        );
     }
 
     @Override
@@ -66,6 +88,8 @@ public class Shooter extends SubsystemBase {
                 handlePassing();
                 break;
         }
+
+        updateGains();
     }
 
     private SystemState handleStateTransitions() {
@@ -100,5 +124,27 @@ public class Shooter extends SubsystemBase {
     public void setWantedState(WantedState wantedState, double scoringRPM) {
         setWantedState(wantedState);
         this.SCORING_RPM = scoringRPM;
+    }
+
+    private void updateGains() {
+        if (!org.team4639.frc2026.Constants.tuningMode) return;
+        boolean shouldUpdate = false;
+        for (TunableNumber n : PIDs.tunableNumbers) {
+            if (n.hasChanged()) {
+                shouldUpdate = true;
+                break;
+            }
+        }
+        if (shouldUpdate) {
+            io.applyNewGains();
+        }
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.dynamic(direction);
     }
 }

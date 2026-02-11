@@ -6,6 +6,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,7 +23,8 @@ public class TurretIOTalonFX implements TurretIO {
 
     private final TalonFXConfiguration config = new TalonFXConfiguration();
 
-    private final PositionVoltage request = new PositionVoltage(0);
+    private final PositionVoltage positionRequest = new PositionVoltage(0);
+    private final VoltageOut voltageRequest = new VoltageOut(0);
 
     private final StatusSignal<Angle> motorPosition;
     private final StatusSignal<AngularVelocity> motorVelocity;
@@ -65,7 +67,12 @@ public class TurretIOTalonFX implements TurretIO {
 
     @Override
     public void setRotorRotation(double rotation) {
-        turretMotor.setControl(request.withPosition(rotation));
+        turretMotor.setControl(positionRequest.withPosition(rotation));
+    }
+
+    @Override
+    public void setVoltage(double voltage) {
+        turretMotor.setControl(voltageRequest.withOutput(voltage));
     }
 
     public void updateGains() {

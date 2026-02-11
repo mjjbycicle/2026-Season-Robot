@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
+import org.team4639.lib.tunable.TunableNumber;
 
 public class Hood extends SubsystemBase {
     private final RobotState state;
@@ -62,6 +63,8 @@ public class Hood extends SubsystemBase {
                 handlePassing();
                 break;
         }
+
+        updateGains();
     }
 
     private SystemState handleStateTransitions() {
@@ -91,5 +94,19 @@ public class Hood extends SubsystemBase {
     public void setWantedState(WantedState wantedState, double scoringAngle) {
         setWantedState(wantedState);
         this.SCORING_HOOD_ANGLE = scoringAngle;
+    }
+
+    private void updateGains() {
+        if (!org.team4639.frc2026.Constants.tuningMode) return;
+        boolean shouldUpdate = false;
+        for (TunableNumber n : PIDs.tunableNumbers) {
+            if (n.hasChanged()) {
+                shouldUpdate = true;
+                break;
+            }
+        }
+        if (shouldUpdate) {
+            io.applyNewGains();
+        }
     }
 }

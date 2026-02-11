@@ -2,11 +2,17 @@
 
 package org.team4639.frc2026.subsystems.turret;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
+import org.team4639.lib.tunable.TunableNumber;
+
+import static edu.wpi.first.units.Units.Volts;
 
 public class Turret extends SubsystemBase {
     private final RobotState state;
@@ -23,6 +29,8 @@ public class Turret extends SubsystemBase {
 
     private final double initialTurretRotation;
     private final double initialMotorRotation;
+
+    private final SysIdRoutine sysIdRoutine;
 
     public enum WantedState {
         IDLE,
@@ -49,6 +57,20 @@ public class Turret extends SubsystemBase {
         rightEncoderIO.updateInputs(rightEncoderInputs);
         initialTurretRotation = getTurretRotation();
         initialMotorRotation = turretInputs.motorPositionRotations;
+
+        sysIdRoutine = new SysIdRoutine(
+                new SysIdRoutine.Config(
+                        null,
+                        null,
+                        null,
+                        sysIdState -> SignalLogger.writeString("SysIdTurret_State", sysIdState.toString())
+                ),
+                new SysIdRoutine.Mechanism(
+                        voltage -> turretIO.setVoltage(voltage.in(Volts)),
+                        null,
+                        this
+                )
+        );
     }
 
     @Override
@@ -81,6 +103,8 @@ public class Turret extends SubsystemBase {
                 handlePassing();
                 break;
         }
+
+        updateGains();
     }
 
     private SystemState handleStateTransitions() {
@@ -164,5 +188,27 @@ public class Turret extends SubsystemBase {
 
     public boolean atSetpoint() {
         return MathUtil.isNear(getRotorSetpoint(), turretInputs.motorPositionRotations, Constants.ROTOR_ROTATION_TOLERANCE);
+    }
+
+    private void updateGains() {
+        if (!org.team4639.frc2026.Constants.tuningMode) return;
+        boolean shouldUpdate = false;
+        for (TunableNumber n : PIDs.tunableNumbers) {
+            if (n.hasChanged()) {
+                shouldUpdate = true;
+                break;
+            }
+        }
+        if (shouldUpdate) {
+            turretIO.applyNewGains();
+        }
+    }
+
+    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.quasistatic(direction);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+        return sysIdRoutine.dynamic(direction);
     }
 }
