@@ -2,9 +2,6 @@
 
 package org.team4639.frc2026.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.RevolutionsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase;
@@ -15,10 +12,10 @@ import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import org.team4639.frc2026.util.PortConfiguration;
-import org.team4639.lib.util.LoggedTunableNumber;
+
+import static edu.wpi.first.units.Units.Volts;
 
 public class ShooterIOSparkFlex implements ShooterIO {
     private final SparkFlex leftShooter;
@@ -30,10 +27,6 @@ public class ShooterIOSparkFlex implements ShooterIO {
     public static final SparkFlexConfig shooterConfig = new SparkFlexConfig();
     public static final SparkFlexConfig leaderConfig = new SparkFlexConfig();
     public static final SparkFlexConfig followerConfig = new SparkFlexConfig();
-
-    private Voltage targetVoltage = Volts.of(0);
-
-    private AngularVelocity targetVelocity = RevolutionsPerSecond.of(0);
 
     private final double SHOOTER_GEAR_RATIO = 1.0;
 
@@ -87,14 +80,13 @@ public class ShooterIOSparkFlex implements ShooterIO {
 
     @Override
     public void setVoltage(double appliedVolts) {
-        targetVoltage = Volts.of(appliedVolts);
+        Voltage targetVoltage = Volts.of(appliedVolts);
         rightShooter.setVoltage(targetVoltage);
     }
 
     @Override
     public void setRPM(double targetRPM) {
         double applied = targetRPM * SHOOTER_GEAR_RATIO / 60.0;
-        targetVelocity = RevolutionsPerSecond.of(applied);
         closedLoopController.setSetpoint(applied, SparkBase.ControlType.kVelocity);
     }
 
