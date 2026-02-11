@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface TurretIO {
 
-    default void setRotorRotation(double rotation) {}
+    default void setRotorRotationSetpoint(double rotation) {}
 
     default void setVoltage(double voltage) {}
 

@@ -63,6 +63,11 @@ public class HoodIOTalonFX implements HoodIO {
         inputs.pivotVelocityDegrees = hoodEncoder.getVelocity().getValueAsDouble() / ENCODER_ROTATIONS_PER_DEGREE;
     }
 
+    @Override
+    public void setVoltage(double volts){
+        hoodMotor.setVoltage(volts);
+    }
+
     public void updateGains() {
         config.Slot0.kP = PIDs.hoodKp.get();
         config.Slot0.kI = PIDs.hoodKi.get();

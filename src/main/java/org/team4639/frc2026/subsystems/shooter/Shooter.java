@@ -2,18 +2,20 @@
 
 package org.team4639.frc2026.subsystems.shooter;
 
-import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import org.littletonrobotics.junction.Logger;
-import org.team4639.frc2026.RobotState;
-import org.team4639.lib.tunable.TunableNumber;
 
 import static edu.wpi.first.units.Units.Volts;
 
-public class Shooter extends SubsystemBase {
+import org.littletonrobotics.junction.Logger;
+import org.team4639.frc2026.Constants;
+import org.team4639.frc2026.RobotState;
+import org.team4639.lib.util.FullSubsystem;
+import org.team4639.lib.util.LoggedTunableNumber;
+
+public class Shooter extends FullSubsystem {
     private final RobotState state;
     private final ShooterIO io;
     private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -22,7 +24,8 @@ public class Shooter extends SubsystemBase {
     private final double IDLE_VOLTAGE = 0;
     private double SCORING_RPM = 0;
 
-    private final SysIdRoutine sysIdRoutine;
+    private final boolean usingStates = true;
+    private final ShooterSysID sysID = new ShooterSysID.ShooterSysIDWPI(this, inputs);
 
     public enum WantedState {
         OFF,
@@ -44,20 +47,6 @@ public class Shooter extends SubsystemBase {
     public Shooter(ShooterIO io, RobotState state) {
         this.io = io;
         this.state = state;
-
-        sysIdRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(
-                        null,
-                        null,
-                        null,
-                        sysIdState -> SignalLogger.writeString("SysIdShooter_State", sysIdState.toString())
-                ),
-                new SysIdRoutine.Mechanism(
-                        voltage -> io.setVoltage(voltage.in(Volts)),
-                        null,
-                        this
-                )
-        );
     }
 
     @Override
@@ -89,7 +78,19 @@ public class Shooter extends SubsystemBase {
                 break;
         }
 
-        updateGains();
+        if (Constants.tuningMode) {
+            LoggedTunableNumber.ifChanged(
+                hashCode(), io::applyNewGains, 
+                PIDs.shooterKp, PIDs.shooterKi, PIDs.shooterKd, 
+                PIDs.shooterKs, PIDs.shooterKv, PIDs.shooterKa
+            );
+        }
+    }
+
+    @Override
+    public void periodicAfterScheduler() {
+        RobotState.getInstance().setShooterStates(new Pair<Shooter.WantedState,Shooter.SystemState>(wantedState, systemState));
+        RobotState.getInstance().accept(inputs);
     }
 
     private SystemState handleStateTransitions() {
@@ -126,25 +127,12 @@ public class Shooter extends SubsystemBase {
         this.SCORING_RPM = scoringRPM;
     }
 
-    private void updateGains() {
-        if (!org.team4639.frc2026.Constants.tuningMode) return;
-        boolean shouldUpdate = false;
-        for (TunableNumber n : PIDs.tunableNumbers) {
-            if (n.hasChanged()) {
-                shouldUpdate = true;
-                break;
-            }
-        }
-        if (shouldUpdate) {
-            io.applyNewGains();
-        }
-    }
-
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return sysIdRoutine.quasistatic(direction);
-    }
-
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return sysIdRoutine.dynamic(direction);
+    /**
+     * Should not be called in comp code. All usages of 
+     * setVoltage() needed for comp should be called internally.
+     * @param volts
+     */
+    public void setVoltage(Voltage volts) {
+        if (!usingStates) io.setVoltage(volts.in(Volts));
     }
 }

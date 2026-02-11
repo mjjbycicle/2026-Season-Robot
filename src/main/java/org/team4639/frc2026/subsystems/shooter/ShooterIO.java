@@ -26,5 +26,7 @@ public interface ShooterIO {
         public double rightTemperature;
         public double leftRPM;
         public double rightRPM;
+        public double leftRotations;
+        public double rightRotations;
     }
 }

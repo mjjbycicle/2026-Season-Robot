@@ -2,24 +2,13 @@
 
 package org.team4639.frc2026.subsystems.turret;
 
-import org.team4639.lib.tunable.TunableNumber;
-
-import java.util.List;
+import org.team4639.lib.util.LoggedTunableNumber;
 
 public class PIDs {
-    public static final TunableNumber turretKp = new TunableNumber(0);
-    public static final TunableNumber turretKi = new TunableNumber(0);
-    public static final TunableNumber turretKd = new TunableNumber(0);
-    public static final TunableNumber turretKs = new TunableNumber(0);
-    public static final TunableNumber turretKv = new TunableNumber(0);
-    public static final TunableNumber turretKa = new TunableNumber(0);
-
-    public static final List<TunableNumber> tunableNumbers = List.of(
-            turretKp,
-            turretKi,
-            turretKd,
-            turretKs,
-            turretKv,
-            turretKa
-    );
+    public static final LoggedTunableNumber turretKp = new LoggedTunableNumber("Turret/kP").initDefault(0);
+    public static final LoggedTunableNumber turretKi = new LoggedTunableNumber("Turret/kI").initDefault(0);
+    public static final LoggedTunableNumber turretKd = new LoggedTunableNumber("Turret/kD").initDefault(0);
+    public static final LoggedTunableNumber turretKs = new LoggedTunableNumber("Turret/kS").initDefault(0);
+    public static final LoggedTunableNumber turretKv = new LoggedTunableNumber("Turret/kV").initDefault(0);
+    public static final LoggedTunableNumber turretKa = new LoggedTunableNumber("Turret/kA").initDefault(0);
 }
