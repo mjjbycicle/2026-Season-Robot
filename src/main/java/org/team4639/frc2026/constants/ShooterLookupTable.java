@@ -31,9 +31,9 @@ public class ShooterLookupTable {
         return new ShooterState(Rotations.per(Minute).of(shooterRPM), Rotations.of(hoodAngle), neededTurretRotation.getMeasure());
     }
 
-    public static ShooterState calculateShooterStateSOTF(Pose2d robotPose, Translation2d hubTranslation, ChassisSpeeds chassisSpeeds) {
+    public static ShooterState calculateIdealShooterStateSOTF(Pose2d robotPose, Translation2d hubTranslation, ChassisSpeeds chassisSpeeds) {
         Translation2d robotTranslation = robotPose.getTranslation();
-        Rotation2d robotRotation = robotPose.getRotation();
+        Angle robotRotation = robotPose.getRotation().getMeasure();
         Translation2d robotToHubTranslation = hubTranslation.minus(robotTranslation);
         Vector<N2> robotToHub = VecBuilder.fill(robotToHubTranslation.getX(), robotToHubTranslation.getY());
         Vector<N2> robotVelocity = VecBuilder.fill(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
@@ -43,8 +43,9 @@ public class ShooterLookupTable {
         double a = (Math.pow(robotVelocity.norm(), 2) - Math.pow(averageHorizontalVelocityMetersPerSecond, 2));
         double b = -2 * (robotToHub.dot(robotVelocity));
         double c = Math.pow(robotToHub.norm(), 2);
-        double res1 = (-b + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
-        double res2 = (-b - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+        double discriminant = Math.pow(b, 2) - 4 * a * c;
+        double res1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+        double res2 = (-b - Math.sqrt(discriminant)) / (2 * a);
         double realTOF;
         if (res1 < 0) {
             if (res2 < 0) {
@@ -62,6 +63,10 @@ public class ShooterLookupTable {
         Vector<N2> robotDisplacementFinal = robotVelocity.times(realTOF);
         Vector<N2> shootingDistanceFinal = robotToHub.minus(robotDisplacementFinal);
         Angle fieldRelativeTurretDirection = Radians.of(shootingDistanceFinal.dot(i_hat) / shootingDistanceFinal.norm());
+        Angle robotRelativeTurretDirection = fieldRelativeTurretDirection.minus(robotRotation);
         double shootingDistanceMagnitudeMeters = shootingDistanceFinal.norm();
+        double shootingRPM = scoringDistanceToRPM.get(shootingDistanceMagnitudeMeters);
+        double shootingHoodAngle = scoringDistanceToHoodAngle.get(shootingDistanceMagnitudeMeters);
+        return new ShooterState(Rotations.per(Minute).of(shootingRPM), Rotations.of(shootingHoodAngle), robotRelativeTurretDirection);
     }
 }
