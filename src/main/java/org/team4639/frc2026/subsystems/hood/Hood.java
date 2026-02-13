@@ -77,8 +77,8 @@ public class Hood extends FullSubsystem {
 
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
-                hashCode(), io::applyNewGains, 
-                PIDs.hoodKp, PIDs.hoodKi, PIDs.hoodKd, 
+                hashCode(), io::applyNewGains,
+                PIDs.hoodKp, PIDs.hoodKi, PIDs.hoodKd,
                 PIDs.hoodKs, PIDs.hoodKv, PIDs.hoodKa
             );
         }
@@ -121,7 +121,7 @@ public class Hood extends FullSubsystem {
     }
 
     /**
-     * Should not be called in comp code. All usages of 
+     * Should not be called in comp code. All usages of
      * setVoltage() needed for comp should be called internally.
      * @param volts
      */

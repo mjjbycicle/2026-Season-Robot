@@ -78,8 +78,8 @@ public class Shooter extends FullSubsystem {
 
         if (Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
-                hashCode(), io::applyNewGains, 
-                PIDs.shooterKp, PIDs.shooterKi, PIDs.shooterKd, 
+                hashCode(), io::applyNewGains,
+                PIDs.shooterKp, PIDs.shooterKi, PIDs.shooterKd,
                 PIDs.shooterKs, PIDs.shooterKv, PIDs.shooterKa
             );
         }
@@ -126,7 +126,7 @@ public class Shooter extends FullSubsystem {
     }
 
     /**
-     * Should not be called in comp code. All usages of 
+     * Should not be called in comp code. All usages of
      * setVoltage() needed for comp should be called internally.
      * @param volts voltage to set shooter motors to
      */

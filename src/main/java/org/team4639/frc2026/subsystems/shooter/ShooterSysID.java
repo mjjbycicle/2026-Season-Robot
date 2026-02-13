@@ -1,3 +1,5 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Minute;
@@ -28,7 +30,7 @@ public abstract sealed class ShooterSysID {
                     Volts.of(3),
                     null,
                     (state) -> Logger.recordOutput("SysIdTestState", state.toString())
-                ), 
+                ),
                 new SysIdRoutine.Mechanism(
                     shooter::setVoltage,
                     log -> {
@@ -52,7 +54,7 @@ public abstract sealed class ShooterSysID {
                     Volts.of(3),
                     null,
                     (state) -> Logger.recordOutput("SysIdTestState", state.toString())
-                ), 
+                ),
                 new SysIdRoutine.Mechanism(
                     shooter::setVoltage,
                     null // record URCL data, left motor should be used as leader for SparkFlex io
@@ -70,7 +72,7 @@ public abstract sealed class ShooterSysID {
                     Volts.of(3),
                     null,
                     (state) -> Logger.recordOutput("SysIdTestState", state.toString())
-                ), 
+                ),
                 new SysIdRoutine.Mechanism(
                     shooter::setVoltage,
                     null // record SignalLogger data, right motor should be used as leader in io talonFX
