@@ -2,15 +2,10 @@
 
 package org.team4639.frc2026;
 
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.*;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
@@ -23,6 +18,8 @@ import lombok.Setter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants.Mode;
+import org.team4639.frc2026.constants.shooter.ShooterScoringData;
+import org.team4639.frc2026.constants.shooter.ShooterState;
 import org.team4639.frc2026.subsystems.drive.Drive;
 import org.team4639.frc2026.subsystems.hood.Hood;
 import org.team4639.frc2026.subsystems.hood.HoodIO;
@@ -82,6 +79,7 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
      * Pose <b>relative to our alliance wall</b>
      */
     private Pose2d estimatedPose = Pose2d.kZero;
+    private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     // RobotState Field and Pose Publishers
     private final String ROBOT_FIELD_INTERNAL_KEY = "/Internal/Robot Pose";
@@ -201,6 +199,10 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         estimatedPose = estimateAtTime.plus(scaledTransform).plus(sampleToOdometryTransform);
     }
 
+    public void updateChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        this.chassisSpeeds = chassisSpeeds;
+    }
+
     private record OdometryObservation(
             SwerveModulePosition[] wheelPositions, Optional<Rotation2d> gyroAngle, double timestamp) {}
 
@@ -274,5 +276,14 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
 
     public void accept(TurretIO.TurretIOInputs inputs){
         //TODO: something with this
+    }
+
+    public ShooterState calculateShooterState() {
+        Translation2d hubTranslation = FieldConstants.Hub.topCenterPoint.toTranslation2d();
+        if (MathUtil.isNear(0, chassisSpeeds.vxMetersPerSecond, 0.01) || MathUtil.isNear(0, chassisSpeeds.vyMetersPerSecond, 0.01)) {
+            return ShooterScoringData.shooterLookupTable.calculateShooterStateStationary(estimatedPose, hubTranslation);
+        } else {
+            return ShooterScoringData.shooterLookupTable.convergeShooterStateSOTF(estimatedPose, hubTranslation, chassisSpeeds, 10);
+        }
     }
 }

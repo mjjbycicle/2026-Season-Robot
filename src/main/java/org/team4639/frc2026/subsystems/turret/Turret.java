@@ -129,8 +129,12 @@ public class Turret extends FullSubsystem {
         return (closestLeft + closestRight) / Constants.SHARED_GEAR_TO_TURRET_GEAR_RATIO;
     }
 
+    public double getTurretRotationFromRotorRotation() {
+        return initialTurretRotation + (turretInputs.motorPositionRotations * Constants.MOTOR_TO_TURRET_GEAR_RATIO);
+    }
+
     public double getRotorDeltaRotations(double turretDeltaRotations) {
-        return turretDeltaRotations / Constants.TURRET_TO_MOTOR_GEAR_RATIO;
+        return turretDeltaRotations / Constants.MOTOR_TO_TURRET_GEAR_RATIO;
     }
 
     public double getRotorRotationsFromAbsoluteTurretRotation(double targetTurretRotations) {

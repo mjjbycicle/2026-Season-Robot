@@ -17,10 +17,10 @@ public interface TurretIO {
     @AutoLog
     class TurretIOInputs {
         public boolean turretMotorConnected = true;
-        public double motorVoltage;
-        public double motorCurrent;
-        public double motorTemperature;
-        public double motorVelocity;
-        public double motorPositionRotations;
+        public double motorVoltage = 0.0;
+        public double motorCurrent = 0.0;
+        public double motorTemperature = 0.0;
+        public double motorVelocity = 0.0;
+        public double motorPositionRotations = 0.0;
     }
 }

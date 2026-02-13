@@ -9,8 +9,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.team4639.frc2026.constants.ShooterLookupTable;
-import org.team4639.frc2026.constants.ShooterState;
+import org.team4639.frc2026.constants.shooter.ShooterLookupTable;
+import org.team4639.frc2026.constants.shooter.ShooterState;
 
 public class ShooterLookupTableTest {
 
@@ -25,7 +25,7 @@ public class ShooterLookupTableTest {
             new Rotation2d()
     );
     final static Translation2d hubTranslation =  new Translation2d(4.623, 4.028);
-    final static ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.5, -0.1, 0);
+    final static ChassisSpeeds chassisSpeeds = new ChassisSpeeds(1, -3, 0);
 
     static {
         LoadShooterLookupTableData.loadData(distToRPM, distToAngle, distToTOF);
@@ -44,7 +44,9 @@ public class ShooterLookupTableTest {
     public void shooterLookupTableTest() {
         ShooterState state = shooterLookupTable.calculateIdealShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds);
         System.out.println("shooter state: " + state);
-        ShooterState convergeState = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 10);
-        System.out.println("shooter state: " + convergeState);
+        ShooterState convergeState1 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 5);
+        System.out.println("shooter state: " + convergeState1);
+        ShooterState convergeState2 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 10);
+        System.out.println("shooter state: " + convergeState2);
     }
 }
