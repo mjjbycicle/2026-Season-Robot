@@ -14,16 +14,14 @@ import edu.wpi.first.units.measure.Angle;
 
 import static edu.wpi.first.units.Units.*;
 
-public class ShooterLookupTable {
-    private final InterpolatingDoubleTreeMap scoringDistanceToRPM; // meters -> RPM
-    private final InterpolatingDoubleTreeMap scoringDistanceToHoodAngle; // meters -> encoder angle
-    private final InterpolatingDoubleTreeMap scoringDistanceToTOF; // meters -> seconds
-
-    public ShooterLookupTable(InterpolatingDoubleTreeMap scoringDistanceToRPM, InterpolatingDoubleTreeMap scoringDistanceToHoodAngle, InterpolatingDoubleTreeMap scoringDistanceToTOF) {
-        this.scoringDistanceToRPM = scoringDistanceToRPM;
-        this.scoringDistanceToHoodAngle = scoringDistanceToHoodAngle;
-        this.scoringDistanceToTOF = scoringDistanceToTOF;
-    }
+/**
+ * @param scoringDistanceToRPM       meters -> RPM
+ * @param scoringDistanceToHoodAngle meters -> encoder angle
+ * @param scoringDistanceToTOF       meters -> seconds
+ */
+public record ShooterLookupTable(InterpolatingDoubleTreeMap scoringDistanceToRPM,
+                                 InterpolatingDoubleTreeMap scoringDistanceToHoodAngle,
+                                 InterpolatingDoubleTreeMap scoringDistanceToTOF) {
 
     private static final Vector<N2> i_hat = VecBuilder.fill(1, 0);
 
@@ -59,7 +57,7 @@ public class ShooterLookupTable {
             if (res2 < 0) {
                 return null;
             } else {
-                 realTOF = res2;
+                realTOF = res2;
             }
         } else {
             if (res2 < 0) {
@@ -81,7 +79,7 @@ public class ShooterLookupTable {
     public ShooterState convergeShooterStateSOTF(Pose2d robotPose, Translation2d hubTranslation, ChassisSpeeds chassisSpeeds, int maxIterations) {
         Translation2d robotTranslation = robotPose.getTranslation();
         Rotation2d robotRotation = robotPose.getRotation();
-        Translation2d robotDisplacement = new Translation2d(0,0);
+        Translation2d robotDisplacement = new Translation2d(0, 0);
         Translation2d robotVelocity = new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
         for (int i = 0; i < maxIterations; i++) {
             Translation2d robotTranslationAfterDisplacement = robotTranslation.plus(robotDisplacement);
