@@ -8,6 +8,8 @@ public interface TurretIO {
 
     default void setRotorRotationSetpoint(double rotation) {}
 
+    default void setVoltage(double voltage) {}
+
     default void updateInputs(TurretIOInputs inputs) {}
 
     default void applyNewGains() {}

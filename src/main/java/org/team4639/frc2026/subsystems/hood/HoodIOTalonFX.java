@@ -2,9 +2,8 @@
 
 package org.team4639.frc2026.subsystems.hood;
 
-import static org.team4639.frc2026.subsystems.hood.Constants.*;
-
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -12,9 +11,15 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
 import org.team4639.frc2026.util.PhoenixUtil;
 import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.Phoenix6Factory;
+
+import static org.team4639.frc2026.subsystems.hood.Constants.*;
 
 public class HoodIOTalonFX implements HoodIO {
     private final TalonFX hoodMotor;
@@ -23,6 +28,11 @@ public class HoodIOTalonFX implements HoodIO {
     private final TalonFXConfiguration config = new TalonFXConfiguration();
 
     private final PositionVoltage request = new PositionVoltage(0);
+
+    private final StatusSignal<Angle> hoodPosition;
+    private final StatusSignal<AngularVelocity> hoodVelocity;
+    private final StatusSignal<Voltage> motorVoltage;
+    private final StatusSignal<Current> motorCurrent;
 
     public HoodIOTalonFX(PortConfiguration ports) {
         hoodMotor = Phoenix6Factory.createDefaultTalon(ports.HoodMotorID);
@@ -38,6 +48,11 @@ public class HoodIOTalonFX implements HoodIO {
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         applyNewGains();
+
+        hoodPosition = hoodEncoder.getPosition();
+        hoodVelocity = hoodEncoder.getVelocity();
+        motorVoltage = hoodMotor.getMotorVoltage();
+        motorCurrent = hoodMotor.getStatorCurrent();
     }
 
     @Override
@@ -50,17 +65,17 @@ public class HoodIOTalonFX implements HoodIO {
     @Override
     public void updateInputs(HoodIOInputs inputs) {
         inputs.hoodMotorConnected = BaseStatusSignal.refreshAll(
-                        hoodMotor.getMotorVoltage(),
-                        hoodMotor.getSupplyCurrent(),
-                        hoodMotor.getDeviceTemp(),
-                        hoodMotor.getPosition(),
-                        hoodMotor.getVelocity())
-                .isOK();
-        inputs.pivotVoltage = hoodMotor.getMotorVoltage().getValueAsDouble();
-        inputs.pivotCurrent = hoodMotor.getSupplyCurrent().getValueAsDouble();
+                motorVoltage,
+                motorCurrent,
+                hoodMotor.getDeviceTemp(),
+                hoodVelocity,
+                hoodPosition
+        ).isOK();
+        inputs.pivotVoltage = motorVoltage.getValueAsDouble();
+        inputs.pivotCurrent = motorCurrent.getValueAsDouble();
         inputs.pivotTemperature = hoodMotor.getDeviceTemp().getValueAsDouble();
-        inputs.pivotPositionDegrees = hoodEncoder.getPosition().getValueAsDouble() / ENCODER_ROTATIONS_PER_DEGREE;
-        inputs.pivotVelocityDegrees = hoodEncoder.getVelocity().getValueAsDouble() / ENCODER_ROTATIONS_PER_DEGREE;
+        inputs.pivotPositionDegrees = hoodPosition.getValueAsDouble() / ENCODER_ROTATIONS_PER_DEGREE;
+        inputs.pivotVelocityDegrees = hoodVelocity.getValueAsDouble() / ENCODER_ROTATIONS_PER_DEGREE;
     }
 
     @Override

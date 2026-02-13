@@ -167,6 +167,16 @@ public class Turret extends FullSubsystem {
         turretIO.setRotorRotationSetpoint(getRotorRotationsFromAbsoluteTurretRotation(nearestTurretRotation));
     }
 
+    public void setWantedState(WantedState wantedState) {
+        this.wantedState = wantedState;
+    }
+
+    public void setWantedState(WantedState wantedState, double SCORING_TURRET_ROTATION, double PASSING_TURRET_ROTATION) {
+        this.SCORING_TURRET_ROTATION = SCORING_TURRET_ROTATION;
+        this.PASSING_TURRET_ROTATION = PASSING_TURRET_ROTATION;
+        setWantedState(wantedState);
+    }
+
     public double getTurretSetpoint() {
         return switch (systemState) {
             case IDLE -> IDLE_TURRET_ROTATION;

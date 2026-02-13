@@ -50,17 +50,17 @@ public class TurretIOTalonFX implements TurretIO {
     @Override
     public void updateInputs(TurretIOInputs inputs) {
         inputs.turretMotorConnected = BaseStatusSignal.refreshAll(
-                turretMotor.getMotorVoltage(),
-                turretMotor.getStatorCurrent(),
+                motorVoltage,
+                motorCurrent,
                 turretMotor.getDeviceTemp(),
-                turretMotor.getVelocity(),
-                turretMotor.getPosition()
+                motorVelocity,
+                motorPosition
         ).isOK();
-        inputs.motorVoltage = turretMotor.getMotorVoltage().getValueAsDouble();
-        inputs.motorCurrent = turretMotor.getStatorCurrent().getValueAsDouble();
+        inputs.motorVoltage = motorVoltage.getValueAsDouble();
+        inputs.motorCurrent = motorCurrent.getValueAsDouble();
         inputs.motorTemperature = turretMotor.getDeviceTemp().getValueAsDouble();
-        inputs.motorVelocity = turretMotor.getVelocity().getValueAsDouble();
-        inputs.motorPositionRotations = turretMotor.getPosition().getValueAsDouble();
+        inputs.motorVelocity = motorVelocity.getValueAsDouble();
+        inputs.motorPositionRotations = motorPosition.getValueAsDouble();
     }
 
     @Override
