@@ -101,7 +101,7 @@ public class Turret extends FullSubsystem {
     @Override
     public void periodicAfterScheduler() {
         RobotState.getInstance().setTurretStates(new Pair<Turret.WantedState,Turret.SystemState>(wantedState, systemState));
-        RobotState.getInstance().accept(turretInputs, Rotation2d.fromRotations(getTurretRotationFromRotorRotation()));
+        RobotState.getInstance().accept(turretInputs);
     }
 
     private SystemState handleStateTransitions() {

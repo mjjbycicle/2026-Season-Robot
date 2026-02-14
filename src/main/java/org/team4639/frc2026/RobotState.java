@@ -283,7 +283,7 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
     }
 
     public Pose2d getTurretPose() {
-        return estimatedPose.transformBy(robotToTurret).rotateBy(this.turretRotation);
+        return estimatedPose.transformBy(robotToTurret).rotateBy(Rotation2d.fromRotations((this.shooterState.turretAngle().in(Rotations))));
     }
 
     @Override
@@ -308,8 +308,8 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         //TODO: something with this
     }
 
-    public void accept(TurretIO.TurretIOInputs inputs, Rotation2d turretAngle){
-        this.turretRotation = turretAngle;
+    public void accept(TurretIO.TurretIOInputs inputs){
+        //TODO: something with this
     }
 
     public ScoringState calculateScoringState() {
