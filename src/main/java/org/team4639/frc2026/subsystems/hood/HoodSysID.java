@@ -1,3 +1,5 @@
+/* Copyright (c) 2025-2026 FRC 4639. */
+
 package org.team4639.frc2026.subsystems.hood;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -25,10 +27,10 @@ public sealed abstract class HoodSysID {
             super(hood, inputs);
             super.routine = new SysIdRoutine(
                 new SysIdRoutine.Config(
-                    Volts.per(Second).of(0.1), 
+                    Volts.per(Second).of(0.1),
                     Volts.of(0.5), null,
                     (state) -> Logger.recordOutput("SysIdTestState", state.toString())
-                ), 
+                ),
                 new SysIdRoutine.Mechanism(
                     hood::setVoltage,
                     log -> {
@@ -36,7 +38,7 @@ public sealed abstract class HoodSysID {
                         .angularVelocity(Degrees.per(Second).of(inputs.pivotVelocityDegrees))
                         .angularPosition(Degrees.of(inputs.pivotPositionDegrees))
                         .voltage(Volts.of(inputs.pivotVoltage));
-                     }, 
+                     },
                     hood
                 )
             );
@@ -48,10 +50,10 @@ public sealed abstract class HoodSysID {
             super(hood, inputs);
             super.routine = new SysIdRoutine(
                 new SysIdRoutine.Config(
-                    Volts.per(Second).of(0.1), 
+                    Volts.per(Second).of(0.1),
                     Volts.of(0.5), null,
                     (state) -> SignalLogger.writeString("SysIDTestState", state.toString())
-                ), 
+                ),
                 new SysIdRoutine.Mechanism(
                     hood::setVoltage,
                     null, // SignalLogger

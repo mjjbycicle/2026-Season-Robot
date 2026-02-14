@@ -1,4 +1,6 @@
-package org.team4639.frc2026.constants;
+/* Copyright (c) 2025-2026 FRC 4639. */
+
+package org.team4639.frc2026.constants.shooter;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -12,14 +14,18 @@ import edu.wpi.first.units.measure.Angle;
 
 import static edu.wpi.first.units.Units.*;
 
-public class ShooterLookupTable {
-    private static final InterpolatingDoubleTreeMap scoringDistanceToRPM = new InterpolatingDoubleTreeMap(); // meters -> RPM
-    private static final InterpolatingDoubleTreeMap scoringDistanceToHoodAngle = new InterpolatingDoubleTreeMap(); // meters -> encoder angle
-    private static final InterpolatingDoubleTreeMap scoringDistanceToTOF = new InterpolatingDoubleTreeMap(); // meters -> seconds
+/**
+ * @param scoringDistanceToRPM       meters -> RPM
+ * @param scoringDistanceToHoodAngle meters -> encoder angle
+ * @param scoringDistanceToTOF       meters -> seconds
+ */
+public record ShooterLookupTable(InterpolatingDoubleTreeMap scoringDistanceToRPM,
+                                 InterpolatingDoubleTreeMap scoringDistanceToHoodAngle,
+                                 InterpolatingDoubleTreeMap scoringDistanceToTOF) {
 
     private static final Vector<N2> i_hat = VecBuilder.fill(1, 0);
 
-    public static ShooterState calculateShooterStateStationary(Pose2d robotPose, Translation2d hubTranslation) {
+    public ScoringState calculateShooterStateStationary(Pose2d robotPose, Translation2d hubTranslation) {
         Translation2d robotTranslation = robotPose.getTranslation();
         Rotation2d robotRotation = robotPose.getRotation();
         Translation2d robotToHubTranslation = hubTranslation.minus(robotTranslation);
@@ -28,10 +34,10 @@ public class ShooterLookupTable {
         double distanceMeters = robotToHubTranslation.getNorm();
         double shooterRPM = scoringDistanceToRPM.get(distanceMeters);
         double hoodAngle = scoringDistanceToHoodAngle.get(distanceMeters);
-        return new ShooterState(Rotations.per(Minute).of(shooterRPM), Rotations.of(hoodAngle), neededTurretRotation.getMeasure());
+        return new ScoringState(Rotations.per(Minute).of(shooterRPM), Rotations.of(hoodAngle), neededTurretRotation.getMeasure());
     }
 
-    public static ShooterState calculateIdealShooterStateSOTF(Pose2d robotPose, Translation2d hubTranslation, ChassisSpeeds chassisSpeeds) {
+    public ScoringState calculateIdealShooterStateSOTF(Pose2d robotPose, Translation2d hubTranslation, ChassisSpeeds chassisSpeeds) {
         Translation2d robotTranslation = robotPose.getTranslation();
         Angle robotRotation = robotPose.getRotation().getMeasure();
         Translation2d robotToHubTranslation = hubTranslation.minus(robotTranslation);
@@ -51,7 +57,7 @@ public class ShooterLookupTable {
             if (res2 < 0) {
                 return null;
             } else {
-                 realTOF = res2;
+                realTOF = res2;
             }
         } else {
             if (res2 < 0) {
@@ -67,6 +73,26 @@ public class ShooterLookupTable {
         double shootingDistanceMagnitudeMeters = shootingDistanceFinal.norm();
         double shootingRPM = scoringDistanceToRPM.get(shootingDistanceMagnitudeMeters);
         double shootingHoodAngle = scoringDistanceToHoodAngle.get(shootingDistanceMagnitudeMeters);
-        return new ShooterState(Rotations.per(Minute).of(shootingRPM), Rotations.of(shootingHoodAngle), robotRelativeTurretDirection);
+        return new ScoringState(Rotations.per(Minute).of(shootingRPM), Rotations.of(shootingHoodAngle), robotRelativeTurretDirection);
+    }
+
+    public ScoringState convergeShooterStateSOTF(Pose2d robotPose, Translation2d hubTranslation, ChassisSpeeds chassisSpeeds, int maxIterations) {
+        Translation2d robotTranslation = robotPose.getTranslation();
+        Rotation2d robotRotation = robotPose.getRotation();
+        Translation2d robotDisplacement = new Translation2d(0, 0);
+        Translation2d robotVelocity = new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+        for (int i = 0; i < maxIterations; i++) {
+            Translation2d robotTranslationAfterDisplacement = robotTranslation.plus(robotDisplacement);
+            Translation2d robotDisplacedToHubTranslation = hubTranslation.minus(robotTranslationAfterDisplacement);
+            double newDistance = robotDisplacedToHubTranslation.getNorm();
+            double newTOF = scoringDistanceToTOF.get(newDistance);
+            robotDisplacement = robotVelocity.times(newTOF);
+        }
+        Translation2d finalRobotToHubTranslation = hubTranslation.minus(robotTranslation.plus(robotDisplacement));
+        Rotation2d neededTurretRotation = finalRobotToHubTranslation.getAngle().minus(robotRotation);
+        double distanceMeters = finalRobotToHubTranslation.getNorm();
+        double shooterRPM = scoringDistanceToRPM.get(distanceMeters);
+        double hoodAngle = scoringDistanceToHoodAngle.get(distanceMeters);
+        return new ScoringState(Rotations.per(Minute).of(shooterRPM), Rotations.of(hoodAngle), neededTurretRotation.getMeasure());
     }
 }

@@ -46,6 +46,7 @@ public class HoodIOTalonFX implements HoodIO {
         config.CurrentLimits.StatorCurrentLimit = 80;
         config.Audio.BeepOnConfig = false;
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.ClosedLoopGeneral.ContinuousWrap = true;
 
         applyNewGains();
 
@@ -57,7 +58,7 @@ public class HoodIOTalonFX implements HoodIO {
 
     @Override
     public void setSetpointDegrees(double setpointDegrees) {
-        double rotation = setpointDegrees * ENCODER_ROTATIONS_PER_DEGREE;
+        double rotation = (setpointDegrees - HOOD_MIN_ANGLE_DEGREES) * ENCODER_ROTATIONS_PER_DEGREE + HOOD_ENCODER_ROTATION_AT_MIN_ANGLE;
         rotation = MathUtil.clamp(rotation, HOOD_ENCODER_MIN_ROTATION, HOOD_ENCODER_MAX_ROTATION);
         hoodMotor.setControl(request.withPosition(rotation));
     }

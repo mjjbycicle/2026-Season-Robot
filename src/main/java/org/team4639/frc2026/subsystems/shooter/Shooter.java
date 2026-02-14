@@ -11,7 +11,7 @@ import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTunableNumber;
 
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 public class Shooter extends FullSubsystem {
     private final RobotState state;
@@ -76,10 +76,12 @@ public class Shooter extends FullSubsystem {
                 break;
         }
 
+        state.updateShooterState(Rotations.per(Minute).of(inputs.leftRPM), null, null);
+
         if (Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
-                hashCode(), io::applyNewGains, 
-                PIDs.shooterKp, PIDs.shooterKi, PIDs.shooterKd, 
+                hashCode(), io::applyNewGains,
+                PIDs.shooterKp, PIDs.shooterKi, PIDs.shooterKd,
                 PIDs.shooterKs, PIDs.shooterKv, PIDs.shooterKa
             );
         }
@@ -126,7 +128,7 @@ public class Shooter extends FullSubsystem {
     }
 
     /**
-     * Should not be called in comp code. All usages of 
+     * Should not be called in comp code. All usages of
      * setVoltage() needed for comp should be called internally.
      * @param volts voltage to set shooter motors to
      */

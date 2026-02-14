@@ -10,6 +10,8 @@ import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTunableNumber;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 public class Turret extends FullSubsystem {
     private final RobotState state;
     private final TurretIO turretIO;
@@ -84,6 +86,8 @@ public class Turret extends FullSubsystem {
                 break;
         }
 
+        state.updateShooterState(null, null, Rotations.of(getTurretRotationFromRotorRotation()));
+
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
                 hashCode(), turretIO::applyNewGains,
@@ -129,8 +133,12 @@ public class Turret extends FullSubsystem {
         return (closestLeft + closestRight) / Constants.SHARED_GEAR_TO_TURRET_GEAR_RATIO;
     }
 
+    public double getTurretRotationFromRotorRotation() {
+        return initialTurretRotation + (turretInputs.motorPositionRotations * Constants.MOTOR_TO_TURRET_GEAR_RATIO);
+    }
+
     public double getRotorDeltaRotations(double turretDeltaRotations) {
-        return turretDeltaRotations / Constants.TURRET_TO_MOTOR_GEAR_RATIO;
+        return turretDeltaRotations / Constants.MOTOR_TO_TURRET_GEAR_RATIO;
     }
 
     public double getRotorRotationsFromAbsoluteTurretRotation(double targetTurretRotations) {

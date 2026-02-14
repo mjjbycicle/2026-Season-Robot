@@ -2,10 +2,16 @@
 
 package org.team4639.frc2026;
 
+import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.gamepieces.GamePiece;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -17,8 +23,6 @@ import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTracer;
 import org.team4639.lib.util.VirtualSubsystem;
 
-import com.ctre.phoenix6.SignalLogger;
-
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -28,6 +32,10 @@ import com.ctre.phoenix6.SignalLogger;
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
+
+    private final StructArrayPublisher<Pose3d> fuelPosesPublisher = NetworkTableInstance.getDefault()
+            .getStructArrayTopic("MyPoseArray", Pose3d.struct)
+            .publish();
 
     public Robot() {
         // Record metadata
@@ -102,6 +110,15 @@ public class Robot extends LoggedRobot {
         VirtualSubsystem.runAllPeriodicAfterScheduler();
         FullSubsystem.runAllPeriodicAfterScheduler();
         LoggedTracer.record("PeriodicAfterScheduler");
+
+        // Get the positions of the fuel (both on the field and in the air)
+        Pose3d[] fuelPoses = SimulatedArena.getInstance()
+                .getGamePiecesArrayByType("Fuel");
+        fuelPosesPublisher.accept(SimulatedArena.getInstance()
+                .getGamePiecesByType("Fuel")
+                        .stream().map(GamePiece::getPose3d)
+                .toArray(Pose3d[]::new)
+        );
     }
 
     /** This function is called once when the robot is disabled. */
