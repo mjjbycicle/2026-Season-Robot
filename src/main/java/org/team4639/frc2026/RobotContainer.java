@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.team4639.frc2026.auto.AutoCommands;
@@ -89,6 +90,8 @@ public class RobotContainer {
                         RobotState.getInstance()
                 );
 
+                configureButtonBindings();
+
                 break;
 
             case SIM:
@@ -146,6 +149,8 @@ public class RobotContainer {
                         RobotState.getInstance()
                 );
 
+                configureSimButtonBindings();
+
                 break;
 
             default:
@@ -200,9 +205,6 @@ public class RobotContainer {
                 "Drive SysId (Dynamic Forward)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption(
                 "Drive SysId (Dynamic Reverse)", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-        // Configure the button bindings
-        configureButtonBindings();
     }
 
     /**
@@ -217,6 +219,13 @@ public class RobotContainer {
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
 
         controller.a().whileTrue(DriveCommands.joystickDriveAtAngle(drive, () -> 1, () -> 0, () -> Rotation2d.kZero));
+    }
+
+    private void configureSimButtonBindings() {
+        // Default command, normal field-relative drive
+        drive.setDefaultCommand(DriveCommands.joystickDrive(
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+        controller.a().onTrue(Commands.runOnce(() -> SimRobot.getInstance().shootFuel(RobotState.getInstance().calculateScoringState())));
     }
 
     /**

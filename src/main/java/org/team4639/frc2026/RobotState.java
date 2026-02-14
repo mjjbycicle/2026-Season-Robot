@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.Constants.Mode;
 import org.team4639.frc2026.constants.shooter.ShooterScoringData;
-import org.team4639.frc2026.constants.shooter.ShooterState;
+import org.team4639.frc2026.constants.shooter.ScoringState;
 import org.team4639.frc2026.subsystems.drive.Drive;
 import org.team4639.frc2026.subsystems.hood.Hood;
 import org.team4639.frc2026.subsystems.hood.HoodIO;
@@ -35,8 +35,7 @@ import org.team4639.lib.util.geometry.AllianceFlipUtil;
 
 import java.util.*;
 
-import static edu.wpi.first.units.Units.Minute;
-import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.*;
 
 /**
  * RobotState handles all information involving the current state of the robot.
@@ -96,7 +95,7 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
 
     private final TimeInterpolatableBuffer<Pose2d> choreoSetpoints = TimeInterpolatableBuffer.createBuffer(0.05);
 
-    private ShooterState shooterState = new ShooterState(Rotations.per(Minute).of(0.0), Rotations.of(0), Rotations.of(0));
+    private ScoringState shooterState = new ScoringState(Rotations.per(Minute).of(0.0), Rotations.of(0), Rotations.of(0));
 
     @Setter
     private Pair<Hood.WantedState, Hood.SystemState> hoodStates;
@@ -220,7 +219,7 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         Angle newTurretAngle = shooterState.turretAngle();
         if (turretAngle != null) newTurretAngle = turretAngle;
         SmartDashboard.putNumber("Scoring/TurretAngle", newTurretAngle.in(Rotations));
-        shooterState = new ShooterState(newShooterRPM, newHoodAngle, newTurretAngle);
+        shooterState = new ScoringState(newShooterRPM, newHoodAngle, newTurretAngle);
     }
 
     private record OdometryObservation(
@@ -240,6 +239,12 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         SmartDashboard.putData(ROBOT_FIELD_INTERNAL_KEY, robotFieldInternal);
         robotFieldTrue.setRobotPose(getTrueOnFieldPose());
         SmartDashboard.putData(ROBOT_FIELD_TRUE_KEY, robotFieldTrue);
+
+        ScoringState scoringState = calculateScoringState();
+        SmartDashboard.putNumber("Scoring/CalculatedRPM", scoringState.shooterRPM().in(Rotations.per(Minute)));
+        SmartDashboard.putNumber("Scoring/CalculatedHoodAngle", scoringState.hoodAngle().in(Rotations));
+        SmartDashboard.putNumber("Scoring/CalculatedTurretAngle", scoringState.turretAngle().in(Rotations));
+        SmartDashboard.putNumber("Scoring/CalculatedTurretAngleFieldRelative", getEstimatedPose().getRotation().getMeasure().plus(scoringState.turretAngle()).in(Degrees));
     }
 
     @Override
@@ -298,12 +303,12 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         //TODO: something with this
     }
 
-    public ShooterState calculateShooterState() {
+    public ScoringState calculateScoringState() {
         Translation2d hubTranslation = FieldConstants.Hub.topCenterPoint.toTranslation2d();
         if (MathUtil.isNear(0, chassisSpeeds.vxMetersPerSecond, 0.01) || MathUtil.isNear(0, chassisSpeeds.vyMetersPerSecond, 0.01)) {
-            return ShooterScoringData.shooterLookupTable.calculateShooterStateStationary(estimatedPose, hubTranslation);
+            return ShooterScoringData.shooterLookupTable.calculateShooterStateStationary(getEstimatedPose(), hubTranslation);
         } else {
-            return ShooterScoringData.shooterLookupTable.convergeShooterStateSOTF(estimatedPose, hubTranslation, chassisSpeeds, 10);
+            return ShooterScoringData.shooterLookupTable.convergeShooterStateSOTF(getEstimatedPose(), hubTranslation, chassisSpeeds, 10);
         }
     }
 }

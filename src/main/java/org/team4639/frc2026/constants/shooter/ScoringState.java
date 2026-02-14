@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.Rotations;
 
-public record ShooterState(AngularVelocity shooterRPM, Angle hoodAngle, Angle turretAngle) {
+public record ScoringState(AngularVelocity shooterRPM, Angle hoodAngle, Angle turretAngle) {
     @Override
     public String toString() {
         return "RPM: " + shooterRPM.in(Rotations.per(Minute)) + " Hood Angle: " + hoodAngle.in(Rotations) + " turretAngle: "  + turretAngle.in(Rotations);

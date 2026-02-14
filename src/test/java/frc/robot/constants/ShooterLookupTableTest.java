@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.team4639.frc2026.constants.shooter.ShooterLookupTable;
-import org.team4639.frc2026.constants.shooter.ShooterState;
+import org.team4639.frc2026.constants.shooter.ScoringState;
 
 public class ShooterLookupTableTest {
 
@@ -42,11 +42,11 @@ public class ShooterLookupTableTest {
 
     @Test
     public void shooterLookupTableTest() {
-        ShooterState state = shooterLookupTable.calculateIdealShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds);
+        ScoringState state = shooterLookupTable.calculateIdealShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds);
         System.out.println("shooter state: " + state);
-        ShooterState convergeState1 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 5);
+        ScoringState convergeState1 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 5);
         System.out.println("shooter state: " + convergeState1);
-        ShooterState convergeState2 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 10);
+        ScoringState convergeState2 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 10);
         System.out.println("shooter state: " + convergeState2);
     }
 }

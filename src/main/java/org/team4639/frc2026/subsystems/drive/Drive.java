@@ -200,7 +200,7 @@ public class Drive extends SubsystemBase {
                             gyroInputs.connected ? Optional.of(rawGyroRotation) : Optional.empty(),
                             sampleTimestamps[i]);
 
-            RobotState.getInstance().updateChassisSpeeds(this.getChassisSpeeds());
+            RobotState.getInstance().updateChassisSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation()));
         }
 
         // Update gyro alert
