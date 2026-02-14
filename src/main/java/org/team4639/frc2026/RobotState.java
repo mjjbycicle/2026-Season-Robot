@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
@@ -97,12 +98,16 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
 
     private ScoringState shooterState = new ScoringState(Rotations.per(Minute).of(0.0), Rotations.of(0), Rotations.of(0));
 
+    private final Transform2d robotToTurret = new Transform2d(Units.inchesToMeters(5.9), 0, Rotation2d.kZero);
+
     @Setter
     private Pair<Hood.WantedState, Hood.SystemState> hoodStates;
     @Setter
     private Pair<Shooter.WantedState, Shooter.SystemState> shooterStates;
     @Setter
     private Pair<Turret.WantedState, Turret.SystemState> turretStates;
+
+    private Rotation2d turretRotation = Rotation2d.kZero;
 
     /**
      * Returns the pose relative to the blue alliance wall.
@@ -277,6 +282,10 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         }
     }
 
+    public Pose2d getTurretPose() {
+        return estimatedPose.transformBy(robotToTurret).rotateBy(this.turretRotation);
+    }
+
     @Override
     public void accept(
             int cameraIndex,
@@ -299,16 +308,16 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
         //TODO: something with this
     }
 
-    public void accept(TurretIO.TurretIOInputs inputs){
-        //TODO: something with this
+    public void accept(TurretIO.TurretIOInputs inputs, Rotation2d turretAngle){
+        this.turretRotation = turretAngle;
     }
 
     public ScoringState calculateScoringState() {
         Translation2d hubTranslation = FieldConstants.Hub.topCenterPoint.toTranslation2d();
         if (MathUtil.isNear(0, chassisSpeeds.vxMetersPerSecond, 0.01) || MathUtil.isNear(0, chassisSpeeds.vyMetersPerSecond, 0.01)) {
-            return ShooterScoringData.shooterLookupTable.calculateShooterStateStationary(getEstimatedPose(), hubTranslation);
+            return ShooterScoringData.shooterLookupTable.calculateShooterStateStationary(getTurretPose(), hubTranslation);
         } else {
-            return ShooterScoringData.shooterLookupTable.convergeShooterStateSOTF(getEstimatedPose(), hubTranslation, chassisSpeeds, 10);
+            return ShooterScoringData.shooterLookupTable.convergeShooterStateSOTF(getTurretPose(), hubTranslation, chassisSpeeds, 10);
         }
     }
 }

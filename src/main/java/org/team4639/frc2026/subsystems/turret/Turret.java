@@ -4,6 +4,7 @@ package org.team4639.frc2026.subsystems.turret;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
@@ -100,7 +101,7 @@ public class Turret extends FullSubsystem {
     @Override
     public void periodicAfterScheduler() {
         RobotState.getInstance().setTurretStates(new Pair<Turret.WantedState,Turret.SystemState>(wantedState, systemState));
-        RobotState.getInstance().accept(turretInputs);
+        RobotState.getInstance().accept(turretInputs, Rotation2d.fromRotations(getTurretRotationFromRotorRotation()));
     }
 
     private SystemState handleStateTransitions() {
