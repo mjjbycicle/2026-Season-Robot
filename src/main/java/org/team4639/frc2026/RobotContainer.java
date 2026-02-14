@@ -10,17 +10,22 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.team4639.frc2026.auto.AutoCommands;
 import org.team4639.frc2026.commands.DriveCommands;
-import org.team4639.frc2026.subsystems.drive.Drive;
-import org.team4639.frc2026.subsystems.drive.GyroIO;
-import org.team4639.frc2026.subsystems.drive.GyroIOPigeon2;
-import org.team4639.frc2026.subsystems.drive.GyroIOSim;
-import org.team4639.frc2026.subsystems.drive.ModuleIO;
-import org.team4639.frc2026.subsystems.drive.ModuleIOTalonFX;
-import org.team4639.frc2026.subsystems.drive.ModuleIOTalonFXSim;
+import org.team4639.frc2026.constants.ports.Netherite;
+import org.team4639.frc2026.subsystems.drive.*;
 import org.team4639.frc2026.subsystems.drive.generated.TunerConstants;
+import org.team4639.frc2026.subsystems.hood.Hood;
+import org.team4639.frc2026.subsystems.hood.HoodIO;
+import org.team4639.frc2026.subsystems.hood.HoodIOSim;
+import org.team4639.frc2026.subsystems.hood.HoodIOTalonFX;
+import org.team4639.frc2026.subsystems.shooter.Shooter;
+import org.team4639.frc2026.subsystems.shooter.ShooterIO;
+import org.team4639.frc2026.subsystems.shooter.ShooterIOSim;
+import org.team4639.frc2026.subsystems.shooter.ShooterIOSparkFlex;
+import org.team4639.frc2026.subsystems.turret.*;
 import org.team4639.frc2026.subsystems.vision.Vision;
 import org.team4639.frc2026.subsystems.vision.VisionConstants;
 import org.team4639.frc2026.subsystems.vision.VisionIOPhotonVisionSim;
+import org.team4639.frc2026.util.PortConfiguration;
 import org.team4639.lib.util.LoggedLazyAutoChooser;
 import org.team4639.lib.util.geometry.AllianceFlipUtil;
 
@@ -31,9 +36,14 @@ import org.team4639.lib.util.geometry.AllianceFlipUtil;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    private final PortConfiguration portConfiguration = Netherite.portConfiguration;
+
     // Subsystems
     private final Drive drive;
     private final Vision vision;
+    private final Hood hood;
+    private final Shooter shooter;
+    private final Turret turret;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -41,7 +51,9 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedLazyAutoChooser autoChooser;
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    /**
+     * The container for the robot. Contains subsystems, OI devices, and commands.
+     */
     public RobotContainer() {
         switch (Constants.currentMode) {
             case REAL:
@@ -54,10 +66,28 @@ public class RobotContainer {
                         new ModuleIOTalonFX(TunerConstants.FrontRight),
                         new ModuleIOTalonFX(TunerConstants.BackLeft),
                         new ModuleIOTalonFX(TunerConstants.BackRight),
-                        pose -> {});
+                        pose -> {}
+                );
 
                 // No cameras on real robot yet
                 vision = new Vision(RobotState.getInstance());
+
+                hood = new Hood(new HoodIOTalonFX(portConfiguration), RobotState.getInstance());
+                shooter = new Shooter(new ShooterIOSparkFlex(portConfiguration), RobotState.getInstance());
+                turret = new Turret(
+                        new TurretIOTalonFX(portConfiguration),
+                        new EncoderIOCANCoder(
+                                portConfiguration.TurretLeftEncoderID,
+                                org.team4639.frc2026.subsystems.turret.Constants.LEFT_ENCODER_OFFSET,
+                                org.team4639.frc2026.subsystems.turret.Constants.LEFT_ENCODER_INVERTED
+                        ),
+                        new EncoderIOCANCoder(
+                                portConfiguration.TurretRightEncoderID,
+                                org.team4639.frc2026.subsystems.turret.Constants.RIGHT_ENCODER_OFFSET,
+                                org.team4639.frc2026.subsystems.turret.Constants.RIGHT_ENCODER_INVERTED
+                        ),
+                        RobotState.getInstance()
+                );
 
                 break;
 
@@ -106,19 +136,45 @@ public class RobotContainer {
                                 () -> AllianceFlipUtil.apply(SimRobot.getInstance()
                                         .getSwerveDriveSimulation()
                                         .getSimulatedDriveTrainPose())));
+
+                hood = new Hood(new HoodIOSim(), RobotState.getInstance());
+                shooter = new Shooter(new ShooterIOSim(), RobotState.getInstance());
+                turret = new Turret(
+                        new TurretIOSim(),
+                        new EncoderIOSim(),
+                        new EncoderIOSim(),
+                        RobotState.getInstance()
+                );
+
                 break;
 
             default:
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
-                        new GyroIO() {},
-                        new ModuleIO() {},
-                        new ModuleIO() {},
-                        new ModuleIO() {},
-                        new ModuleIO() {},
-                        pose -> {});
+                        new GyroIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        pose -> {
+                        });
 
                 vision = new Vision(RobotState.getInstance());
+
+                hood = new Hood(new HoodIO() {}, RobotState.getInstance());
+                shooter = new Shooter(new ShooterIO() {}, RobotState.getInstance());
+                turret = new Turret(
+                        new TurretIO() {},
+                        new EncoderIO() {},
+                        new EncoderIO() {},
+                        RobotState.getInstance()
+                );
+
                 break;
         }
 

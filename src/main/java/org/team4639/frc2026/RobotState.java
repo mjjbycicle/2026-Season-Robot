@@ -10,6 +10,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,6 +34,9 @@ import org.team4639.lib.util.VirtualSubsystem;
 import org.team4639.lib.util.geometry.AllianceFlipUtil;
 
 import java.util.*;
+
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.Rotations;
 
 /**
  * RobotState handles all information involving the current state of the robot.
@@ -90,6 +95,8 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
     private final String CHOREO_SETPOINT_KEY = "/Internal/Choreo Setpoint";
 
     private final TimeInterpolatableBuffer<Pose2d> choreoSetpoints = TimeInterpolatableBuffer.createBuffer(0.05);
+
+    private ShooterState shooterState = new ShooterState(Rotations.per(Minute).of(0.0), Rotations.of(0), Rotations.of(0));
 
     @Setter
     private Pair<Hood.WantedState, Hood.SystemState> hoodStates;
@@ -201,6 +208,19 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
 
     public void updateChassisSpeeds(ChassisSpeeds chassisSpeeds) {
         this.chassisSpeeds = chassisSpeeds;
+    }
+
+    public void updateShooterState(AngularVelocity shooterRPM, Angle hoodAngle, Angle turretAngle) {
+        AngularVelocity newShooterRPM = shooterState.shooterRPM();
+        if (shooterRPM != null) newShooterRPM = shooterRPM;
+        Logger.recordOutput("Shooter Subsystem/ShooterRPM", newShooterRPM);
+        Angle newHoodAngle = shooterState.hoodAngle();
+        if (hoodAngle != null) newHoodAngle = hoodAngle;
+        Logger.recordOutput("Shooter Subsystem/HoodAngle", newHoodAngle);
+        Angle newTurretAngle = shooterState.turretAngle();
+        if (turretAngle != null) newTurretAngle = turretAngle;
+        Logger.recordOutput("Shooter Subsystem/TurretAngle", newTurretAngle);
+        shooterState = new ShooterState(newShooterRPM, newHoodAngle, newTurretAngle);
     }
 
     private record OdometryObservation(

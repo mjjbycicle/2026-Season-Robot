@@ -11,7 +11,7 @@ import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTunableNumber;
 
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 public class Shooter extends FullSubsystem {
     private final RobotState state;
@@ -75,6 +75,8 @@ public class Shooter extends FullSubsystem {
                 handlePassing();
                 break;
         }
+
+        state.updateShooterState(Rotations.per(Minute).of(inputs.leftRPM), null, null);
 
         if (Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(

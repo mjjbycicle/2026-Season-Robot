@@ -10,6 +10,8 @@ import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTunableNumber;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 public class Turret extends FullSubsystem {
     private final RobotState state;
     private final TurretIO turretIO;
@@ -83,6 +85,8 @@ public class Turret extends FullSubsystem {
                 handlePassing();
                 break;
         }
+
+        state.updateShooterState(null, null, Rotations.of(getTurretRotationFromRotorRotation()));
 
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(

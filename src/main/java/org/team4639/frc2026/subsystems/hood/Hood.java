@@ -6,13 +6,12 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import lombok.Getter;
-
-import static edu.wpi.first.units.Units.Volts;
-
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
 import org.team4639.lib.util.LoggedTunableNumber;
+
+import static edu.wpi.first.units.Units.*;
 
 public class Hood extends FullSubsystem {
     private final RobotState state;
@@ -74,6 +73,8 @@ public class Hood extends FullSubsystem {
                 handlePassing();
                 break;
         }
+
+        state.updateShooterState(null, Degrees.of(inputs.pivotPositionDegrees), null);
 
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
