@@ -213,13 +213,13 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
     public void updateShooterState(AngularVelocity shooterRPM, Angle hoodAngle, Angle turretAngle) {
         AngularVelocity newShooterRPM = shooterState.shooterRPM();
         if (shooterRPM != null) newShooterRPM = shooterRPM;
-        Logger.recordOutput("Shooter Subsystem/ShooterRPM", newShooterRPM);
+        SmartDashboard.putNumber("Scoring/ShooterRPM", newShooterRPM.in(Rotations.per(Minute)));
         Angle newHoodAngle = shooterState.hoodAngle();
         if (hoodAngle != null) newHoodAngle = hoodAngle;
-        Logger.recordOutput("Shooter Subsystem/HoodAngle", newHoodAngle);
+        SmartDashboard.putNumber("Scoring/HoodAngle", newHoodAngle.in(Rotations));
         Angle newTurretAngle = shooterState.turretAngle();
         if (turretAngle != null) newTurretAngle = turretAngle;
-        Logger.recordOutput("Shooter Subsystem/TurretAngle", newTurretAngle);
+        SmartDashboard.putNumber("Scoring/TurretAngle", newTurretAngle.in(Rotations));
         shooterState = new ShooterState(newShooterRPM, newHoodAngle, newTurretAngle);
     }
 
