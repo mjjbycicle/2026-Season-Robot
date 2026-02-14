@@ -48,9 +48,15 @@ public class Shooter extends FullSubsystem {
     }
 
     @Override
-    public void periodic() {
+    public void periodicBeforeScheduler() {
         io.updateInputs(inputs);
         Logger.processInputs("Shooter", inputs);
+        state.updateShooterState(Rotations.per(Minute).of(inputs.leftRPM), null, null);
+    }
+
+    @Override
+    public void periodic() {
+
         SystemState newState = handleStateTransitions();
         if (newState != systemState) {
             Logger.recordOutput("Shooter/SystemState", newState.toString());
@@ -75,8 +81,6 @@ public class Shooter extends FullSubsystem {
                 handlePassing();
                 break;
         }
-
-        state.updateShooterState(Rotations.per(Minute).of(inputs.leftRPM), null, null);
 
         if (Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
