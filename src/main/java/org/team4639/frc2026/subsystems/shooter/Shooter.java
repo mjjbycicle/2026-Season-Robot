@@ -136,7 +136,7 @@ public class Shooter extends FullSubsystem {
      * setVoltage() needed for comp should be called internally.
      * @param volts voltage to set shooter motors to
      */
-    public void setVoltage(Voltage volts) {
-        if (!usingStates) io.setVoltage(volts.in(Volts));
+    protected void setVoltage(Voltage volts) {
+        io.setVoltage(volts.in(Volts));
     }
 }
