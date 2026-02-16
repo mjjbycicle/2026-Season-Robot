@@ -3,8 +3,7 @@
 package org.team4639.frc2026.subsystems.turret;
 
 public class Constants {
-    public static final double MOTOR_TO_TURRET_GEAR_RATIO = 12.0 / 28 * 18 / 40 * 12 / 92;
-    public static final double TURRET_DEGREES_PER_MOTOR_ROTATION = MOTOR_TO_TURRET_GEAR_RATIO * 360.0;
+    public static final double MOTOR_TO_TURRET_GEAR_RATIO =  12.0 / 28 * 18 / 40 * 12 / 92;
     public static final double SHARED_GEAR_TO_TURRET_GEAR_RATIO = 92.0 / 12;
 
     // As viewed from above, intake facing up

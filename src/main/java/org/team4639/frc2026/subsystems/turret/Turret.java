@@ -4,7 +4,6 @@ package org.team4639.frc2026.subsystems.turret;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
@@ -70,9 +69,9 @@ public class Turret extends FullSubsystem {
             systemState = newState;
         }
 
-        if (DriverStation.isDisabled()) {
-            systemState = SystemState.IDLE;
-        }
+//        if (DriverStation.isDisabled()) {
+//            systemState = SystemState.IDLE;
+//        }
 
         switch (systemState) {
             case IDLE:
@@ -92,14 +91,16 @@ public class Turret extends FullSubsystem {
             LoggedTunableNumber.ifChanged(
                 hashCode(), turretIO::applyNewGains,
                 PIDs.turretKp, PIDs.turretKi, PIDs.turretKd,
-                PIDs.turretKs, PIDs.turretKv, PIDs.turretKa
+                PIDs.turretKs, PIDs.turretKv, PIDs.turretKa,
+                PIDs.turretKpSim, PIDs.turretKiSim, PIDs.turretKdSim,
+                PIDs.turretKsSim, PIDs.turretKvSim, PIDs.turretKaSim
             );
         }
     }
 
     @Override
     public void periodicAfterScheduler() {
-        RobotState.getInstance().setTurretStates(new Pair<Turret.WantedState,Turret.SystemState>(wantedState, systemState));
+        RobotState.getInstance().setTurretStates(new Pair<>(wantedState, systemState));
         RobotState.getInstance().accept(turretInputs);
     }
 
@@ -134,7 +135,7 @@ public class Turret extends FullSubsystem {
     }
 
     public double getTurretRotationFromRotorRotation() {
-        return initialTurretRotation + (turretInputs.motorPositionRotations * Constants.MOTOR_TO_TURRET_GEAR_RATIO);
+        return initialTurretRotation + ((turretInputs.motorPositionRotations - initialRotorRotation) * Constants.MOTOR_TO_TURRET_GEAR_RATIO);
     }
 
     public double getRotorDeltaRotations(double turretDeltaRotations) {
@@ -150,11 +151,11 @@ public class Turret extends FullSubsystem {
         if (clampedRotation < 0.4 && clampedRotation > -0.4) {
             return clampedRotation;
         }
-        double currentTurretRotation = getTurretRotation();
+        double currentTurretRotation = getTurretRotationFromRotorRotation();
         if (currentTurretRotation * clampedRotation > 0) return clampedRotation;
-        if (currentTurretRotation < 0 && clampedRotation > 0.4) {
+        if (currentTurretRotation < 0 && clampedRotation >= 0.4) {
             return clampedRotation - 1;
-        } else if (currentTurretRotation > 0 && clampedRotation < -0.4) {
+        } else if (currentTurretRotation > 0 && clampedRotation <= -0.4) {
             return clampedRotation + 1;
         } else {
             return clampedRotation;

@@ -75,7 +75,7 @@ public class SimRobot extends VirtualSubsystem {
                 // The launch speed is proportional to the RPM; assumed to be 16 meters/second at 6000 RPM
                 Meters.per(Second).of(scoringState.shooterRPM().in(Radians.per(Second)) * 0.0508),
                 // The angle at which the note is launched
-                scoringState.hoodAngle()
+                Rotations.of(0.25).minus(scoringState.hoodAngle())
         );
         fuelOnFly.setHitTargetCallBack(() -> System.out.println("FUEL hits HUB!"));
         SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);

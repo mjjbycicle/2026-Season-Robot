@@ -116,9 +116,9 @@ public class Hood extends FullSubsystem {
         this.wantedState = wantedState;
     }
 
-    public void setWantedState(WantedState wantedState, double scoringAngle) {
+    public void setWantedState(WantedState wantedState, double scoringAngleRotations) {
         setWantedState(wantedState);
-        this.SCORING_HOOD_ANGLE = scoringAngle;
+        this.SCORING_HOOD_ANGLE = Rotations.of(scoringAngleRotations).in(Degrees);
     }
 
     /**
