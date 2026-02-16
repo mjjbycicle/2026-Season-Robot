@@ -284,7 +284,7 @@ public class RobotState extends VirtualSubsystem implements VisionConsumer {
     }
 
     public Pose2d getTurretPose() {
-        return estimatedPose.transformBy(robotToTurret).rotateBy(Rotation2d.fromRotations((this.shooterState.turretAngle().in(Rotations))));
+        return estimatedPose.transformBy(robotToTurret).rotateBy(Rotation2d.fromRotations((this.scoringState.turretAngle().in(Rotations))));
     }
 
     @Override
