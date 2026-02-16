@@ -12,7 +12,7 @@ public class PIDs {
     public static final LoggedTunableNumber turretKv = new LoggedTunableNumber("Turret/kV").initDefault(0);
     public static final LoggedTunableNumber turretKa = new LoggedTunableNumber("Turret/kA").initDefault(0);
 
-    public static final LoggedTunableNumber turretKpSim = new LoggedTunableNumber("Turret/kPSim").initDefault(4);
+    public static final LoggedTunableNumber turretKpSim = new LoggedTunableNumber("Turret/kPSim").initDefault(6);
     public static final LoggedTunableNumber turretKiSim = new LoggedTunableNumber("Turret/kISim").initDefault(0);
     public static final LoggedTunableNumber turretKdSim = new LoggedTunableNumber("Turret/kDSim").initDefault(0);
     public static final LoggedTunableNumber turretKsSim = new LoggedTunableNumber("Turret/kSSim").initDefault(0);
