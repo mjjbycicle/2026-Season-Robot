@@ -66,7 +66,7 @@ public class SimRobot extends VirtualSubsystem {
                 // Specify the position of the chassis when the note is launched
                 swerveDriveSimulation.getSimulatedDriveTrainPose().getTranslation(),
                 // Specify the translation of the shooter from the robot center (in the shooter’s reference frame)
-                new Translation2d(-Units.inchesToMeters(5.84), 0),
+                new Translation2d(-Units.inchesToMeters(5.84), 0).rotateBy(swerveDriveSimulation.getSimulatedDriveTrainPose().getRotation()),
                 // Specify the field-relative speed of the chassis, adding it to the initial velocity of the projectile
                 swerveDriveSimulation.getDriveTrainSimulatedChassisSpeedsFieldRelative(),
                 // The shooter facing direction is the same as the robot’s facing direction
