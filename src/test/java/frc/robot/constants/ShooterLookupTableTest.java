@@ -42,8 +42,6 @@ public class ShooterLookupTableTest {
 
     @Test
     public void shooterLookupTableTest() {
-        ScoringState state = shooterLookupTable.calculateIdealShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds);
-        System.out.println("shooter state: " + state);
         ScoringState convergeState1 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 5);
         System.out.println("shooter state: " + convergeState1);
         ScoringState convergeState2 = shooterLookupTable.convergeShooterStateSOTF(robotPose, hubTranslation, chassisSpeeds, 10);

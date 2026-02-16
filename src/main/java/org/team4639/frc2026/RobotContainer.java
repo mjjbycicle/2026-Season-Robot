@@ -230,7 +230,7 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-        controller.a().onTrue(Commands.runOnce(() -> SimRobot.getInstance().shootFuel(RobotState.getInstance().getScoringState())));
+        controller.a().onTrue(Commands.runOnce(() -> SimRobot.getInstance().shootFuel(RobotState.getInstance().calculateScoringState())));
     }
 
     /**
