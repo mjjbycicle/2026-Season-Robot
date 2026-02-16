@@ -4,6 +4,8 @@ package org.team4639.frc2026.subsystems.turret;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import org.littletonrobotics.junction.Logger;
 import org.team4639.frc2026.RobotState;
 import org.team4639.lib.util.FullSubsystem;
@@ -55,13 +57,20 @@ public class Turret extends FullSubsystem {
     }
 
     @Override
-    public void periodic() {
+    public void periodicBeforeScheduler() {
         turretIO.updateInputs(turretInputs);
         leftEncoderIO.updateInputs(leftEncoderInputs);
         rightEncoderIO.updateInputs(rightEncoderInputs);
         Logger.processInputs("Turret", turretInputs);
         Logger.processInputs("Left Encoder", leftEncoderInputs);
         Logger.processInputs("Right Encoder", rightEncoderInputs);
+
+        state.updateShooterState(null, null, Rotations.of(getTurretRotationFromRotorRotation()));
+    }
+
+    @Override
+    public void periodic() {
+
 
         SystemState newState = handleStateTransitions();
         if (newState != systemState) {
@@ -84,8 +93,6 @@ public class Turret extends FullSubsystem {
                 handlePassing();
                 break;
         }
-
-        state.updateShooterState(null, null, Rotations.of(getTurretRotationFromRotorRotation()));
 
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(

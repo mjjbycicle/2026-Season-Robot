@@ -93,6 +93,7 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         LoggedTracer.reset();
         VirtualSubsystem.runAllPeriodic();
+        FullSubsystem.runAllPeriodicBeforeScheduler();
         // Optionally switch the thread to high priority to improve loop
         // timing (see the template project documentation for details)
         Threads.setCurrentThreadPriority(true, 99);

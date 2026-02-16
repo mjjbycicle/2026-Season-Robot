@@ -48,9 +48,15 @@ public class Hood extends FullSubsystem {
     }
 
     @Override
-    public void periodic() {
+    public void periodicBeforeScheduler() {
         io.updateInputs(inputs);
         Logger.processInputs("Hood", inputs);
+        state.updateShooterState(null, Degrees.of(inputs.pivotPositionDegrees), null);
+    }
+
+    @Override
+    public void periodic() {
+
 
         SystemState newState = handleStateTransitions();
         if (newState != systemState) {
@@ -73,8 +79,6 @@ public class Hood extends FullSubsystem {
                 handlePassing();
                 break;
         }
-
-        state.updateShooterState(null, Degrees.of(inputs.pivotPositionDegrees), null);
 
         if (org.team4639.frc2026.Constants.tuningMode) {
             LoggedTunableNumber.ifChanged(
